@@ -152,7 +152,6 @@ body.locked header,body.locked .controls,body.locked main,body.locked footer{vis
     <button class="chip" id="geo" type="button">Use my location</button>
   </div>
   <ul id="sugg" class="sugg" hidden></ul>
-  <div class="row quick"><span class="sl">Quick:</span><button class="chip small" data-q="40.7330,-74.0071|Christopher St PATH" type="button">Christopher St PATH</button><button class="chip small" data-q="40.7275,-73.9880|Ukrainian Village" type="button">Ukrainian Village</button><button class="chip small" data-q="40.7359,-73.9911|Union Square" type="button">Union Square</button></div>
   <p class="hint" id="addrMsg"></p>
   </div>
 </div></div>
@@ -199,7 +198,6 @@ document.getElementById("reset").onclick=()=>{priceOn.clear();featOn.clear();doc
 let origin=[40.7330,-74.0071], originLabel="Christopher St PATH";
 const addrEl=document.getElementById("addr"),goBtn=document.getElementById("go"),geoBtn=document.getElementById("geo"),msgEl=document.getElementById("addrMsg");
 function setOrigin(pt,label){origin=pt;originLabel=label;msgEl.textContent="Distances from "+label;if(sortEl.value!=="dist")sortEl.value="dist";render();}
-document.querySelectorAll(".quick .chip").forEach(b=>b.onclick=()=>{const [c,l]=b.dataset.q.split("|");addrEl.value=l;setOrigin(c.split(",").map(Number),l);});
 function gridGeocode(q){
   const t=q.toLowerCase().replace(/\./g,"");
   const stM=t.match(/(?:^|\D)(\d{1,3})(?:st|nd|rd|th)?\s*(?:st|street)\b/);
