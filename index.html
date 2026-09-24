@@ -66,6 +66,7 @@ main{max-width:720px;margin:0 auto;padding:10px 18px 60px}
 .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 .meta b{color:var(--ink);font-weight:600}
 .meta.acts{margin-top:7px;gap:12px 14px}
+.suggestrow{margin-top:26px;padding-top:16px;border-top:1px solid var(--line)}
 .row.start{align-items:center}
 .sl{color:var(--muted)}
 #addr{font:inherit;font-size:14px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);flex:1;min-width:200px}
@@ -214,7 +215,7 @@ input,select,textarea,#q,#hood,#sort,#addr,.sheet input,.sheet select,.sheet tex
 <div class="topbar">
 <header>
   <h1>Date <em>Spot</em></h1>
-  <p class="lede">Manhattan bars worth a date, rated and sorted. <button class="lk" id="suggestBtn" type="button">Suggest a spot</button></p>
+  <p class="lede">Manhattan bars worth a date, rated and sorted.</p>
 </header>
 <div class="controls"><div class="inner">
   <div class="row bar-row">
@@ -271,7 +272,6 @@ input,select,textarea,#q,#hood,#sort,#addr,.sheet input,.sheet select,.sheet tex
 <main>
   <div class="count"><span id="count"></span><button id="expall" class="lk" type="button" hidden>Expand all</button></div>
   <div id="list"></div>
-  <p class="count"><button class="lk" type="button" data-suggest="1">Know a spot we're missing? Suggest it</button></p>
 </main>
 <footer>Hearts rate date potential out of 5. Prices run $ to $$$$. Travel times are estimates. Check the Site link for current hours before you go. Apple and Google open walking directions. Saved picks and notes live on this phone only.</footer>
 </div>
@@ -284,6 +284,7 @@ input,select,textarea,#q,#hood,#sort,#addr,.sheet input,.sheet select,.sheet tex
 <main>
   <div class="count"><span id="shortcount"></span></div>
   <div id="shortlist"></div>
+  <div class="row suggestrow"><button class="chip" id="suggestBtn" type="button">Suggest a spot</button><span class="sl">Know somewhere that belongs here? Send it in.</span></div>
 </main>
 </div>
 
@@ -524,7 +525,7 @@ function renderShort(){
   const el=$("shortlist");el.innerHTML="";
   $("shortcount").textContent=rows.length?rows.length+" saved":"";
   $("tabShortN").textContent=rows.length?String(rows.length):"";
-  if(!rows.length){el.innerHTML='<div class="empty">Nothing saved yet. Tap Save on any bar and it lands here.<br><br><button class="lk" type="button" data-suggest="1">Suggest a spot</button></div>';return;}
+  if(!rows.length){el.innerHTML='<div class="empty">Nothing saved yet. Tap Save on any bar and it lands here.</div>';return;}
   rows.forEach(r=>el.appendChild(card(r)));
 }
 function update(){ALL.forEach(r=>r.tr=travel(r.pt));renderHome();renderShort();if(map)renderMap();}
@@ -641,9 +642,7 @@ $("locate").onclick=()=>{
 
 // ---- suggest a spot (share sheet)
 const sheet=$("sheet");
-function openSuggest(){sheet.hidden=false;$("sgMsg").textContent="";$("sgName").focus();}
-$("suggestBtn").onclick=openSuggest;
-document.addEventListener("click",e=>{if(e.target.closest("[data-suggest]"))openSuggest();});
+$("suggestBtn").onclick=()=>{sheet.hidden=false;$("sgMsg").textContent="";$("sgName").focus();};
 $("sgCancel").onclick=()=>sheet.hidden=true;
 sheet.addEventListener("click",e=>{if(e.target===sheet)sheet.hidden=true;});
 try{$("sgFrom").value=localStorage.getItem("datebars-from")||"";}catch(e){}
