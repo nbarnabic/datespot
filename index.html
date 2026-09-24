@@ -14,7 +14,6 @@
 <style>
 :root{
   box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
   --bg:#f4f1ec;--card:#fffdf9;--ink:#141414;--muted:#6a645d;--line:#ddd6cc;
   --rose:#b8642f;--amber:#b8642f;--chip:#e9e2d8;--chip-on:#141414;--chip-on-ink:#f4f1ec;
@@ -32,7 +31,7 @@
   --rose:#e0834a;--amber:#e0834a;--chip:#262322;--chip-on:#f1ece4;--chip-on-ink:#0f0f10;
   --water:#0a0a0c;--land:#1a1918;--park:#1f241d;--major:#4b4540;--grid:#332f2b;--shore:#3a332d;--stlbl:#948b81;--pinring:#0f0f10;
 }
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html{scroll-padding-top:0}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Fraunces",Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased}
 header{padding:28px 18px 10px;max-width:720px;margin:0 auto}
@@ -141,6 +140,7 @@ footer{padding-bottom:calc(var(--tabh) + 20px)}
 .tabs button{flex:1;border:0;background:none;font:inherit;font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:0}
 .tabs button svg{width:22px;height:22px;fill:currentColor}
 .tabs button[aria-current="page"]{color:var(--rose)}
+#view-short header{padding-top:calc(22px + env(safe-area-inset-top,0px))}
 .tabs b{font-weight:600}
 body.locked .tabs,body.locked .view{visibility:hidden}
 .sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60;display:flex;align-items:flex-end;justify-content:center}
@@ -157,7 +157,7 @@ body.locked .tabs,body.locked .view{visibility:hidden}
 .leaflet-container{font-family:inherit}
 .leaflet-control-attribution{background:transparent!important;color:var(--muted)!important;font-size:9px}
 .leaflet-control-attribution a{color:var(--muted)!important}
-.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);transition:box-shadow .2s}
+.topbar{position:sticky;top:0;padding-top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);transition:box-shadow .2s}
 .topbar header{padding:22px 18px 6px;transition:padding .18s}
 .topbar h1{transition:font-size .18s}
 .topbar .lede{transition:opacity .15s,max-height .18s;max-height:40px;overflow:hidden}
