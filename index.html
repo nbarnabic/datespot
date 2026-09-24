@@ -18,16 +18,19 @@
   padding-bottom:env(safe-area-inset-bottom,0px);
   --bg:#f4f1ec;--card:#fffdf9;--ink:#141414;--muted:#6a645d;--line:#ddd6cc;
   --rose:#b8642f;--amber:#b8642f;--chip:#e9e2d8;--chip-on:#141414;--chip-on-ink:#f4f1ec;
+  --water:#dcd6cb;--land:#f6f3ed;--park:#e0e6d2;--major:#c6bdaf;--grid:#dbd3c7;--shore:#c4bab0;--stlbl:#7d766e;--pinring:#fffdf9;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --bg:#0f0f10;--card:#1b1a1a;--ink:#f1ece4;--muted:#a39a90;--line:#2e2b29;
     --rose:#e0834a;--amber:#e0834a;--chip:#262322;--chip-on:#f1ece4;--chip-on-ink:#0f0f10;
+    --water:#0a0a0c;--land:#1a1918;--park:#1f241d;--major:#4b4540;--grid:#332f2b;--shore:#3a332d;--stlbl:#948b81;--pinring:#0f0f10;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0f0f10;--card:#1b1a1a;--ink:#f1ece4;--muted:#a39a90;--line:#2e2b29;
   --rose:#e0834a;--amber:#e0834a;--chip:#262322;--chip-on:#f1ece4;--chip-on-ink:#0f0f10;
+  --water:#0a0a0c;--land:#1a1918;--park:#1f241d;--major:#4b4540;--grid:#332f2b;--shore:#3a332d;--stlbl:#948b81;--pinring:#0f0f10;
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
@@ -36,6 +39,7 @@ header{padding:28px 18px 10px;max-width:720px;margin:0 auto}
 h1{font-size:44px;line-height:1;margin:0 0 6px;font-weight:600;font-variation-settings:"SOFT" 60;letter-spacing:-.01em}
 h1 em{font-style:italic;color:var(--rose)}
 .lede{color:var(--muted);margin:0 0 6px;font-size:15px}
+.lede button.lk,.count button.lk,.empty button.lk{background:none;border:0;padding:0;font:inherit;font-size:inherit;cursor:pointer;color:var(--rose);border-bottom:1px solid currentColor}
 .controls{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:10px 18px;z-index:5;border-bottom:1px solid var(--line)}
 .controls .inner{max-width:720px;margin:0 auto}
 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
@@ -61,6 +65,7 @@ main{max-width:720px;margin:0 auto;padding:10px 18px 60px}
 .why{margin:4px 0 8px;font-size:15px}
 .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 .meta b{color:var(--ink);font-weight:600}
+.meta.acts{margin-top:7px;gap:12px 14px}
 .row.start{align-items:center}
 .sl{color:var(--muted)}
 #addr{font:inherit;font-size:14px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);flex:1;min-width:200px}
@@ -136,8 +141,7 @@ footer{padding-bottom:calc(var(--tabh) + 20px)}
 .tabs button svg{width:22px;height:22px;fill:currentColor}
 .tabs button[aria-current="page"]{color:var(--rose)}
 .tabs b{font-weight:600}
-body.locked .tabs,body.locked .fab,body.locked .view{visibility:hidden}
-.fab{position:fixed;right:16px;bottom:calc(var(--tabh) + 14px);z-index:20;border:0;border-radius:999px;padding:10px 16px;background:var(--rose);color:#fff;font:inherit;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+body.locked .tabs,body.locked .view{visibility:hidden}
 .sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60;display:flex;align-items:flex-end;justify-content:center}
 .sheet .box{background:var(--card);width:100%;max-width:720px;border-radius:16px 16px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px;max-height:90vh;overflow:auto}
 .sheet h2{margin:0;font-size:22px;font-weight:600}
@@ -145,7 +149,22 @@ body.locked .tabs,body.locked .fab,body.locked .view{visibility:hidden}
 .sheet label{font-size:13px;color:var(--muted);display:block}
 .sheet .btns{display:flex;gap:8px;justify-content:flex-end}
 #view-map{position:fixed;left:0;right:0;top:0;bottom:var(--tabh);z-index:10;min-height:0}
-#map{position:absolute;inset:0;background:var(--bg)}
+#map{position:absolute;inset:0;background:var(--water)}
+.geolbl{color:var(--muted);font-style:italic;font-size:11px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;transform:translate(-50%,-50%);opacity:.8;pointer-events:none}
+.geolbl.p{color:#7a9563}
+.stlbl{display:block;white-space:nowrap;font-size:10.5px;color:var(--stlbl);letter-spacing:.03em;pointer-events:none;text-shadow:0 0 3px var(--land),0 0 3px var(--land)}
+.leaflet-container{font-family:inherit}
+.leaflet-control-attribution{background:transparent!important;color:var(--muted)!important;font-size:9px}
+.leaflet-control-attribution a{color:var(--muted)!important}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);transition:box-shadow .2s}
+.topbar header{padding:22px 18px 6px;transition:padding .18s}
+.topbar h1{transition:font-size .18s}
+.topbar .lede{transition:opacity .15s,max-height .18s;max-height:40px;overflow:hidden}
+body.scrolled .topbar{box-shadow:0 10px 22px -16px rgba(0,0,0,.6)}
+body.scrolled .topbar header{padding:8px 18px 0}
+body.scrolled .topbar h1{font-size:22px}
+body.scrolled .topbar .lede{opacity:0;max-height:0;margin:0}
+.topbar .controls{position:static;border-bottom:0}
 .mapbar{position:absolute;left:10px;right:10px;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:1000;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .seg{display:flex;border-radius:999px;overflow:hidden;border:1px solid var(--line);background:var(--card)}
 .seg button{border:0;background:none;font:inherit;font-size:13px;padding:6px 12px;color:var(--ink);cursor:pointer}
@@ -166,6 +185,7 @@ body.locked .tabs,body.locked .fab,body.locked .view{visibility:hidden}
 .pop .score{font-size:13px}
 #mapMsg{position:absolute;bottom:10px;left:10px;right:10px;z-index:1000;text-align:center;font-size:12px;color:var(--muted);background:var(--card);border-radius:8px;padding:6px;margin:0}
 #mapMsg:empty{display:none}
+input,select,textarea,#q,#hood,#sort,#addr,.sheet input,.sheet select,.sheet textarea,.noteedit textarea{font-size:16px}
 </style>
 </head>
 <body class="locked">
@@ -185,17 +205,17 @@ body.locked .tabs,body.locked .fab,body.locked .view{visibility:hidden}
     </div>
     <button class="open" id="unlock" type="button">Open</button>
     <p class="hint" id="lockMsg"></p>
-    <p class="fine">No passphrase? Ask Nick. Please keep the link and passphrase between friends.</p>
+    <p class="fine">Ask the person who shared this with you for the latest passphrase. Keep the link and passphrase between friends.</p>
     <p class="fine tip">On iPhone: tap Share, then Add to Home Screen, and this opens like an app.</p>
   </div>
 </div>
 
 <div id="view-home" class="view">
+<div class="topbar">
 <header>
   <h1>Date <em>Spot</em></h1>
-  <p class="lede">Manhattan bars worth a date, rated and sorted.</p>
+  <p class="lede">Manhattan bars worth a date, rated and sorted. <button class="lk" id="suggestBtn" type="button">Suggest a spot</button></p>
 </header>
-
 <div class="controls"><div class="inner">
   <div class="row bar-row">
     <input id="q" type="search" placeholder="Search bars, food, vibe" aria-label="Search" autocomplete="off">
@@ -246,12 +266,14 @@ body.locked .tabs,body.locked .fab,body.locked .view{visibility:hidden}
   <p class="hint" id="addrMsg"></p>
   </div>
 </div></div>
+</div>
 
 <main>
   <div class="count"><span id="count"></span><button id="expall" class="lk" type="button" hidden>Expand all</button></div>
   <div id="list"></div>
+  <p class="count"><button class="lk" type="button" data-suggest="1">Know a spot we're missing? Suggest it</button></p>
 </main>
-<footer>Hearts rate date potential out of 5. Prices run $ to $$$$. Travel times are estimates. Check the Site or Map link for current hours before you go. Saved picks and notes live on this phone only.</footer>
+<footer>Hearts rate date potential out of 5. Prices run $ to $$$$. Travel times are estimates. Check the Site link for current hours before you go. Apple and Google open walking directions. Saved picks and notes live on this phone only.</footer>
 </div>
 
 <div id="view-short" class="view" hidden>
@@ -277,7 +299,6 @@ body.locked .tabs,body.locked .fab,body.locked .view{visibility:hidden}
   <p id="mapMsg"></p>
 </div>
 
-<button class="fab" id="suggestBtn" type="button">+ Suggest a spot</button>
 
 <nav class="tabs" aria-label="Sections">
   <button type="button" id="tab-short" aria-current="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.3-8.4C.6 9.4 2.3 5.5 6 5.5c2 0 3.3 1 4 2.2.7-1.2 2-2.2 4-2.2 3.7 0 5.4 3.9 3.3 7.1C19 16.4 12 21 12 21z"/></svg><span>Shortlist <b id="tabShortN"></b></span></button>
@@ -288,11 +309,11 @@ body.locked .tabs,body.locked .fab,body.locked .view{visibility:hidden}
 <div id="sheet" class="sheet" hidden>
   <div class="box" role="dialog" aria-labelledby="sgTitle">
     <h2 id="sgTitle">Suggest a spot</h2>
-    <p>This opens your share sheet. Send it to Nick and he'll add it.</p>
+    <p>This opens your share sheet. Send it to whoever shared the app with you and they'll add it.</p>
     <label>Bar or restaurant <input id="sgName" type="text" autocomplete="off" placeholder="Name"></label>
     <label>Neighborhood <select id="sgHood"><option value="">Not sure</option></select></label>
     <label>Why it's good for a date <textarea id="sgWhy" rows="3" placeholder="Vibe, food, what makes it work"></textarea></label>
-    <label>Your name <input id="sgFrom" type="text" autocomplete="off" placeholder="So Nick knows who to thank"></label>
+    <label>Your name <input id="sgFrom" type="text" autocomplete="off" placeholder="So we know who to thank"></label>
     <p class="hint" id="sgMsg"></p>
     <div class="btns"><button class="chip" id="sgCancel" type="button">Cancel</button><button class="chip" id="sgSend" type="button" style="background:var(--chip-on);color:var(--chip-on-ink)">Send</button></div>
   </div>
@@ -330,7 +351,7 @@ let hood="All";
 const hoodEl=$("hood"),sortEl=$("sort"),fourEl=$("fourPlus"),newEl=$("newOnly"),ftypeEl=$("ftype"),resvEl=$("resv"),dayEl=$("day"),unvEl=$("hideUnv"),qEl=$("q"),pickBtn=$("pick");
 HOODS.forEach(h=>{const o=document.createElement("option");o.textContent=h;hoodEl.appendChild(o);const o2=document.createElement("option");o2.textContent=h;$("sgHood").appendChild(o2);});
 hoodEl.addEventListener("change",()=>selectHood(hoodEl.value,false));
-function selectHood(h,zoom){hood=h;hoodEl.value=h;update();if(zoom!==false&&map)fitHood(h);}
+function selectHood(h,zoom){hood=h;hoodEl.value=h;update();if(map){if(zoom!==false)fitHood(h);restyleBase();}}
 sortEl.addEventListener("change",()=>{openGroups.clear();expandAll=false;update();});
 [fourEl,newEl,ftypeEl,resvEl,dayEl,unvEl].forEach(e=>e.addEventListener("change",()=>update()));
 qEl.addEventListener("input",()=>renderHome());
@@ -419,8 +440,9 @@ try{const s=localStorage.getItem("datebars-sort");if(s)sortEl.value=s;}catch(e){
 function dist(a,b){const R=3959,dLat=(b[0]-a[0])*Math.PI/180,dLon=(b[1]-a[1])*Math.PI/180,la1=a[0]*Math.PI/180,la2=b[0]*Math.PI/180;const h=Math.sin(dLat/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
 function travel(pt){const mi=dist(origin,pt)*1.3;const walk=Math.round(mi*20);if(walk<=25)return {min:walk,mode:"walk"};return {min:Math.round(8+mi*7),mode:"transit"};}
 function hearts(n){return "♥".repeat(n)+"♡".repeat(5-n)}
-function mapUrl(r){return "https://maps.apple.com/?q="+encodeURIComponent(r.name)+"&sll="+r.pt[0]+","+r.pt[1]+"&z=16";}
-function links(r){return `${r.url?`<a href="${r.url}" target="_blank" rel="noopener">Site ↗</a>`:""}${r.rurl?`<a href="${r.rurl}" target="_blank" rel="noopener">Reserve ↗</a>`:""}<a href="${mapUrl(r)}" target="_blank" rel="noopener">Map &amp; hours ↗</a>`;}
+function mapUrl(r){return "https://maps.apple.com/?daddr="+r.pt[0]+","+r.pt[1]+"&dirflg=w";}
+function gmapUrl(r){return "https://www.google.com/maps/dir/?api=1&destination="+r.pt[0]+","+r.pt[1]+"&travelmode=walking";}
+function links(r){return `${r.url?`<a href="${r.url}" target="_blank" rel="noopener">Site ↗</a>`:""}${r.rurl?`<a href="${r.rurl}" target="_blank" rel="noopener">Reserve ↗</a>`:""}<a href="${mapUrl(r)}" target="_blank" rel="noopener">Apple Maps ↗</a><a href="${gmapUrl(r)}" target="_blank" rel="noopener">Google Maps ↗</a>`;}
 function saveBtn(r){return `<button class="lk" type="button" data-save="${r.id}" aria-pressed="${picks.has(r.id)}">${picks.has(r.id)?"Saved ♥":"Save ♡"}</button>`;}
 function filtered(){
   let rows=ALL.slice();
@@ -449,7 +471,8 @@ function card(r){
     <p class="why">${r.why}</p>
     <p class="food"><span class="fl">${r.type}</span> ${r.food}</p>
     ${r.feats.length||r.cuis.length?`<div class="feats">${r.feats.map(f=>`<span>${f}</span>`).join("")}${r.cuis.map(c=>`<span class="cu">${c}</span>`).join("")}</div>`:""}
-    <div class="meta"><span>${r.where}</span><span><b>${"$".repeat(r.cost)}</b></span><span>${r.res}</span>${r.closed?`<span>closed <b>${r.closed.replace(/,/g,", ")}</b></span>`:""}<span><b>${r.tr.min}</b> min ${r.tr.mode}</span>${links(r)}${saveBtn(r)}<button class="lk" type="button" data-share="${r.id}">Share</button><button class="lk" type="button" data-note="${r.id}">${note?"Edit note":"Note"}</button></div>
+    <div class="meta"><span>${r.where}</span><span><b>${"$".repeat(r.cost)}</b></span><span>${r.res}</span>${r.closed?`<span>closed <b>${r.closed.replace(/,/g,", ")}</b></span>`:""}<span><b>${r.tr.min}</b> min ${r.tr.mode}</span></div>
+    <div class="meta acts">${links(r)}${saveBtn(r)}<button class="lk" type="button" data-share="${r.id}">Share</button><button class="lk" type="button" data-note="${r.id}">${note?"Edit note":"Note"}</button></div>
     ${note?`<p class="note">${esc(note)}</p>`:""}
     <div class="noteedit" hidden><textarea rows="3" placeholder="Your note, private to this phone" aria-label="Note">${esc(note||"")}</textarea><div class="row"><button class="chip small" type="button" data-notesave="${r.id}">Save note</button><button class="chip small" type="button" data-notecancel="${r.id}">Cancel</button></div></div>`;
   return d;
@@ -501,7 +524,7 @@ function renderShort(){
   const el=$("shortlist");el.innerHTML="";
   $("shortcount").textContent=rows.length?rows.length+" saved":"";
   $("tabShortN").textContent=rows.length?String(rows.length):"";
-  if(!rows.length){el.innerHTML='<div class="empty">Nothing saved yet. Tap Save on any bar and it lands here.</div>';return;}
+  if(!rows.length){el.innerHTML='<div class="empty">Nothing saved yet. Tap Save on any bar and it lands here.<br><br><button class="lk" type="button" data-suggest="1">Suggest a spot</button></div>';return;}
   rows.forEach(r=>el.appendChild(card(r)));
 }
 function update(){ALL.forEach(r=>r.tr=travel(r.pt));renderHome();renderShort();if(map)renderMap();}
@@ -530,15 +553,38 @@ document.addEventListener("click",async e=>{
 let view="home";
 function showView(v){
   view=v;["home","short","map"].forEach(x=>{$("view-"+x).hidden=x!==v;$("tab-"+x).setAttribute("aria-current",x===v?"page":"false");});
-  $("suggestBtn").hidden=v==="map";
   if(v==="map")openMap();else window.scrollTo(0,0);
 }
 ["home","short","map"].forEach(x=>$("tab-"+x).onclick=()=>showView(x));
+window.addEventListener("scroll",()=>document.body.classList.toggle("scrolled",window.scrollY>28),{passive:true});
 
 // ---- map (Leaflet loads only when the tab is first opened)
-let map=null,L=null,pinLayer=null,lblLayer=null,meMarker=null,tiles=null,leafletP=null;
+let map=null,L=null,pinLayer=null,lblLayer=null,meMarker=null,leafletP=null,geoP=null,cv=null,G=null,hoodPolys={},gridL=null,majorL=null,stLayer=null;
 const darkMq=matchMedia("(prefers-color-scheme: dark)");
-const tileUrl=()=>`https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${darkMq.matches?"Dark":"Light"}_Gray_Base/MapServer/tile/{z}/{y}/{x}`;
+const cssVar=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function loadGeo(){if(geoP)return geoP;geoP=(window.__GEO__?Promise.resolve(window.__GEO__):fetch("manhattan.json",{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("geo");return r.json();})).catch(e=>{geoP=null;throw e;});return geoP;}
+function buildBase(){
+  const poly=(rings,o)=>L.polygon(rings,Object.assign({renderer:cv,interactive:false},o)).addTo(map);
+  G.land.forEach(r=>poly([r],{fillColor:cssVar("--land"),fillOpacity:1,color:cssVar("--shore"),weight:1,opacity:.9}));
+  hoodPolys={};Object.keys(G.hoods).forEach(n=>{hoodPolys[n]=G.hoods[n].map(r=>poly([r],{fillColor:cssVar("--rose"),fillOpacity:.07,stroke:false}));});
+  G.parks.forEach(r=>poly([r],{fillColor:cssVar("--park"),fillOpacity:1,stroke:false}));
+  G.water.forEach(r=>poly([r],{fillColor:cssVar("--water"),fillOpacity:1,stroke:false}));
+  gridL=L.polyline(G.grid,{renderer:cv,interactive:false,color:cssVar("--grid"),weight:.9,opacity:0}).addTo(map);
+  majorL=L.polyline(G.major,{renderer:cv,interactive:false,color:cssVar("--major"),weight:1.3,opacity:.95}).addTo(map);
+  G.labels.forEach(([t,la,ln,k])=>L.marker([la,ln],{icon:L.divIcon({className:"",html:`<span class="geolbl ${k}">${esc(t)}</span>`,iconSize:null}),interactive:false,keyboard:false}).addTo(map));
+  stLayer=L.layerGroup().addTo(map);
+  map.on("zoomend",restyleBase);map.on("moveend",streetLabels);
+  restyleBase();
+}
+function restyleBase(){const z=map.getZoom();gridL.setStyle({opacity:z<13.5?0:z<14.5?.4:z<15.5?.7:1,weight:z<15?.8:z<16?1.1:1.4});majorL.setStyle({weight:z<13?1:z<15?1.4:z<16?2:2.6});Object.keys(hoodPolys).forEach(n=>hoodPolys[n].forEach(p=>p.setStyle({fillOpacity:hood===n?.16:(z>=15?.04:.07)})));streetLabels();}
+function streetLabels(){
+  if(!map||!map._loaded)return;stLayer.clearLayers();const z=map.getZoom();if(z<14.75)return;
+  const b=map.getBounds().pad(.05),cell=z<16?150:110,taken=new Set();let n=0;
+  const cand=G.streets.filter(s=>b.contains([s[1],s[2]])&&(z>=15.75||s[4]===1||n<0)).sort((a,b)=>b[4]-a[4]);
+  for(const s of cand){const pt=map.latLngToContainerPoint([s[1],s[2]]);const key=s[0]+"|"+Math.round(pt.x/cell)+"|"+Math.round(pt.y/cell);if(taken.has(key))continue;taken.add(key);
+    L.marker([s[1],s[2]],{icon:L.divIcon({className:"",html:`<span class="stlbl" style="transform:translate(-50%,-50%) rotate(${s[3]}deg)${s[4]?";font-weight:600":""}">${esc(s[0])}</span>`,iconSize:null}),interactive:false,keyboard:false}).addTo(stLayer);
+    if(++n>=70)break;}
+}
 function loadLeaflet(){
   if(leafletP)return leafletP;
   leafletP=new Promise((res,rej)=>{
@@ -550,13 +596,15 @@ function loadLeaflet(){
 async function openMap(){
   if(!map){
     $("mapMsg").textContent="Loading map…";
-    try{L=await loadLeaflet();}catch(e){$("mapMsg").textContent="Couldn't load the map. Check your connection and tap Map again.";return;}
+    try{[L,G]=await Promise.all([loadLeaflet(),loadGeo()]);}catch(e){$("mapMsg").textContent="Couldn't load the map. Check your connection and tap Map again.";return;}
     if(map)return;
-    map=L.map("map",{zoomControl:false});
-    tiles=L.tileLayer(tileUrl(),{maxZoom:18,maxNativeZoom:16,attribution:'Tiles &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors'}).addTo(map);
-    darkMq.addEventListener("change",()=>tiles.setUrl(tileUrl()));
-    pinLayer=L.layerGroup().addTo(map);lblLayer=L.layerGroup().addTo(map);
+    map=L.map("map",{zoomControl:false,zoomSnap:.25,minZoom:11.5,maxZoom:17.5,attributionControl:true,maxBoundsViscosity:.8});
+    map.attributionControl.setPrefix(false).addAttribution('Map data &copy; OpenStreetMap contributors, NYC Open Data');
+    cv=L.canvas({padding:.5});
+    map.setMaxBounds(L.latLngBounds(G.land.flat()).pad(.35));
     fitHood(hood);
+    buildBase();
+    pinLayer=L.layerGroup().addTo(map);lblLayer=L.layerGroup().addTo(map);
     $("mapMsg").textContent="";
     renderMap();
   }
@@ -571,7 +619,7 @@ function renderMap(){
   $("mapHood").textContent=hood==="All"?"All Manhattan":hood;$("mapCount").textContent=rows.length+" bars";
   rows.forEach(r=>{
     const col=r.score>=5?"#e0834a":r.score>=4?"#c9a26a":"#8a847c";
-    L.circleMarker(r.pt,{radius:7,color:"#0f0f10",weight:1,fillColor:col,fillOpacity:.95}).bindPopup(popupHtml(r),{maxWidth:260}).addTo(pinLayer);
+    L.circleMarker(r.pt,{renderer:cv,radius:7,color:cssVar("--pinring"),weight:1.5,fillColor:col,fillOpacity:.95}).bindPopup(popupHtml(r),{maxWidth:260}).addTo(pinLayer);
   });
   const cnt={};rows.forEach(r=>cnt[r.hood]=(cnt[r.hood]||0)+1);
   HOODS.forEach(h=>{
@@ -586,14 +634,16 @@ $("segList").onclick=()=>showView("home");
 $("locate").onclick=()=>{
   $("locate").textContent="Locating…";
   locate(p=>{$("locate").textContent="◎ Me";const pt=[p.coords.latitude,p.coords.longitude];
-    if(meMarker)meMarker.setLatLng(pt);else meMarker=L.circleMarker(pt,{radius:8,color:"#fff",weight:2,fillColor:"#2f7cf6",fillOpacity:1}).addTo(map);
+    if(meMarker)meMarker.setLatLng(pt);else meMarker=L.circleMarker(pt,{renderer:cv,radius:8,color:"#fff",weight:2,fillColor:"#2f7cf6",fillOpacity:1}).addTo(map);
     map.setView(pt,15);setOrigin(pt,"my location");},
     ()=>{$("locate").textContent="◎ Me";$("mapMsg").textContent="Location blocked. Allow it in Settings.";});
 };
 
 // ---- suggest a spot (share sheet)
 const sheet=$("sheet");
-$("suggestBtn").onclick=()=>{sheet.hidden=false;$("sgMsg").textContent="";$("sgName").focus();};
+function openSuggest(){sheet.hidden=false;$("sgMsg").textContent="";$("sgName").focus();}
+$("suggestBtn").onclick=openSuggest;
+document.addEventListener("click",e=>{if(e.target.closest("[data-suggest]"))openSuggest();});
 $("sgCancel").onclick=()=>sheet.hidden=true;
 sheet.addEventListener("click",e=>{if(e.target===sheet)sheet.hidden=true;});
 try{$("sgFrom").value=localStorage.getItem("datebars-from")||"";}catch(e){}
@@ -603,7 +653,7 @@ $("sgSend").onclick=async()=>{
   const h=$("sgHood").value,why=$("sgWhy").value.trim();
   const text=["Date Spot suggestion"+(from?" from "+from:"")+":",name+(h?" ("+h+")":""),why].filter(Boolean).join("\n");
   if(navigator.share){try{await navigator.share({title:"Date Spot suggestion",text});sheet.hidden=true;$("sgName").value="";$("sgWhy").value="";}catch(err){}}
-  else{try{await navigator.clipboard.writeText(text);$("sgMsg").textContent="Copied to your clipboard. Text it to Nick.";}catch(err){$("sgMsg").textContent="Couldn't open sharing. Text Nick: "+text;}}
+  else{try{await navigator.clipboard.writeText(text);$("sgMsg").textContent="Copied to your clipboard. Text it to whoever shared the app with you.";}catch(err){$("sgMsg").textContent="Couldn't open sharing. Copy this and text it: "+text;}}
 };
 
 update();
