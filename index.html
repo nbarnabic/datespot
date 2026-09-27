@@ -279,6 +279,135 @@ body.locked .tabs,body.locked .view{visibility:hidden}
 .sugg li:last-child{border-bottom:0}
 .sugg li small{display:block;color:var(--muted);font-size:12px}
 .hint{margin:6px 0 0;font-size:12px;color:var(--muted);min-height:1em}
+/* ---- desktop (900px and up) */
+.deskonly{display:none}
+.rank{display:none}
+@media (min-width:900px){
+  .deskonly{display:initial}
+  body{padding-left:232px}
+  .safe,.view.safe{padding-top:0}
+  .topblock{padding-top:0}
+  .tabs{top:0;height:auto;padding:26px 16px 20px;display:flex;flex-direction:column;gap:4px;width:232px;right:auto;border-top:0;border-right:1px solid var(--line)}
+  .tabs .sidewm{display:block;font-size:28px;font-weight:700;letter-spacing:-.5px;padding:0 10px 22px;color:var(--ink)}
+  .tabs .sidewm em{font-style:italic;color:var(--rose)}
+  .tabs button:not(.sideorigin){flex:none;flex-direction:row;justify-content:flex-start;gap:12px;height:44px;padding:0 12px;border-radius:12px;font-size:16px;color:var(--ink);transition:background .15s}
+  .tabs button:not(.sideorigin):hover{background:var(--card)}
+  .tabs button[aria-current="page"]:not(.sideorigin){background:var(--card);color:var(--rose)}
+  .tabs button svg{width:20px;height:20px}
+  .tabs button span{flex:1;text-align:left;display:flex;justify-content:space-between}
+  .tabs button span b{font-weight:400;font-size:13px;color:var(--muted)}
+  .tabs .sidespacer{display:block;flex:1}
+  .tabs .sideorigin{display:block;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit;font-size:13px;color:var(--muted);line-height:1.4;text-align:left;background:transparent;cursor:pointer}
+  .tabs .sideorigin .originlbl{color:var(--ink);border-bottom:1px dashed var(--subtle)}
+  .view{padding-bottom:40px;min-height:100vh}
+  /* home: list + live map */
+  .homegrid{display:grid;grid-template-columns:minmax(0,600px) minmax(0,1fr);min-height:100vh}
+  .homelist{border-right:1px solid var(--line);min-width:0}
+  .homemap{display:block;position:sticky;top:0;height:100vh;background:var(--water)}
+  .homemap .mappanel{height:100%;margin:0;border-radius:0}
+  .hdrrow{display:none}
+  .searchrow{padding:24px 28px 0}
+  .iconbtn{width:auto;padding:0 16px;font-size:15px;gap:8px}
+  .iconbtn .fbl{display:inline}
+  .searchrow #pickBtn{height:46px;border-radius:14px;background:var(--rose);color:var(--bg);border:0;padding:0 18px;font-size:15px;font-weight:600}
+  .searchrow #pickBtn svg{display:none}
+  .modeseg{padding:12px 28px 0}
+  .occrow{padding:12px 28px 0}
+  .occ{padding:7px 13px}
+  body.scrolled .occrow,body.scrolled .modeseg{display:flex}
+  .metarow{padding:14px 28px 14px;border-bottom:1px solid var(--line)}
+  .pickbanner{margin:16px 28px 0}
+  .cards{padding:0 20px}
+  .tier{padding:18px 28px 8px}
+  .tier.c{cursor:default}
+  .tier .chev{display:none}
+  .bar{display:grid;grid-template-columns:30px minmax(0,1fr) 40px;gap:4px 14px;border:1.5px solid transparent;transition:border-color .15s}
+  .bar.hl{border-color:var(--rose)}
+  .bar .rank{display:flex;width:30px;height:30px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:13px;font-weight:700;align-items:center;justify-content:center;grid-row:1/span 4}
+  .bar.hl .rank{background:var(--rose)}
+  .bar .top{display:contents}
+  .bar .top > div{grid-column:2;grid-row:1}
+  .bar .top > .heart{grid-column:3;grid-row:1}
+  .bar .name{display:inline}
+  .bar .name .inlh{display:inline;color:var(--rose);font-size:13px;letter-spacing:1px;margin-left:10px;font-weight:400}
+  .bar .desc,.bar .note1,.bar .bottom{grid-column:2}
+  .bar .heart{grid-column:3;grid-row:1}
+  .bar .bottom .right{display:flex}
+  .mapprev{display:flex;position:absolute;left:20px;right:20px;bottom:20px;max-width:420px;background:var(--card);border-radius:20px;padding:16px 18px;box-shadow:0 12px 40px rgba(0,0,0,.5);gap:14px;align-items:center;z-index:1000}
+  .mapprev .nm{font-size:19px;font-weight:700}
+  .mapprev .sm{font-size:14px;color:var(--muted)}
+  .mapprev a{flex:none;height:42px;padding:0 16px;border-radius:12px;background:var(--rose);color:var(--bg);font-size:15px;font-weight:600;display:flex;align-items:center;text-decoration:none}
+  .pin{width:30px;height:30px;transition:transform .15s}
+  .pin.hl{background:var(--rose);color:var(--bg);transform:translate(-50%,-50%) scale(1.3)}
+  /* plan */
+  #view-plan{padding:44px 56px}
+  .plan-hdr{padding:0;display:none}
+  .planhead{display:flex;justify-content:space-between;align-items:flex-end;gap:24px}
+  .prompt{padding:0;font-size:52px;line-height:1;letter-spacing:-1px}
+  .prompt br{display:none}
+  .planbtn{display:block;flex:none}
+  #view-plan > .pillrow{padding-left:0;padding-right:0}
+  #view-plan .pillrow:first-child{padding-top:0;margin-bottom:22px}
+  .tiles{padding:28px 0 0;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .tile{padding:18px 16px 14px;gap:22px;transition:border-color .15s}
+  .tile:hover{border-color:var(--subtle)}
+  .tile .l{font-size:18px}
+  #view-plan > div[style*="padding:14px 20px 0"]{display:none}
+  #pickcard .pickcard{padding:20px 22px}
+  #pickcard .pickcard .nm{font-size:28px}
+  #pickcard .pickcard .ds{max-width:640px}
+  .railhdr{padding:34px 0 14px}
+  .railhdr b{font-size:22px}
+  .rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0}
+  .rcard{padding:18px}
+  .rcard .nm{font-size:20px}
+  /* date */
+  #view-tonight{padding:44px 56px}
+  .tngrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-content:start}
+  .tn-hdr{padding:0}
+  .tn-hdr .wm{font-size:44px;letter-spacing:-1px}
+  .tn-sub{padding:8px 0 0}
+  .tn-left .pillrow{padding-left:0;padding-right:0}
+  .plancard{margin:22px 0 0;padding:22px 20px}
+  .stop .num{width:32px;height:32px;font-size:15px}
+  .stop .nm{font-size:20px}
+  .gap i{height:32px}
+  .plancard .primary{height:48px}
+  .tn-right .eb2{padding:22px 0 8px}
+  .srow{margin:0;padding:14px 0}
+  .srow .nm{font-size:18px}
+  .ideas{margin:0}
+  #ideas .eb2{padding-left:0;padding-right:0}
+  .toggle{width:38px;height:38px}
+  /* shortlist */
+  #view-short{padding:44px 56px}
+  .shhead{display:flex;justify-content:space-between;align-items:flex-end;gap:20px}
+  .shhead > div:first-child{padding:0!important}
+  .shhead .wm{font-size:44px;letter-spacing:-1px}
+  .shhead .seg{margin:0;width:280px}
+  #shortlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:26px!important}
+  .shrow{background:var(--card);border-radius:18px;padding:18px;border-bottom:0}
+  .shrow .nm{font-size:21px}
+  .shrow .acts .btn{flex:none;padding:0 18px}
+  .shrow .acts .btn.x{margin-left:auto;width:auto;padding:0 14px;font-size:14px}
+  .shrow .acts .btn.x{font-size:0}
+  .shrow .acts .btn.x::after{content:"Remove";font-size:14px}
+  .suggestrow{margin:26px 0 0}
+  /* map tab */
+  #view-map{height:100vh;padding:0}
+  .mapgrid{display:grid;grid-template-columns:360px minmax(0,1fr);height:100vh}
+  .mapleft{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
+  .maplisthdr{padding:24px 22px 10px;flex-direction:column;align-items:flex-start;gap:4px}
+  .maplisthdr b{font-size:22px}
+  .maplist{padding:0 12px 20px}
+  .mrow{margin:0;padding:12px 10px;border-radius:12px;border-bottom:0}
+  .mrow.hl{margin:0;background:var(--card)}
+  .mrow .rank{width:28px;height:28px}
+  .mapslot .mappanel{height:100%;margin:0;border-radius:0}
+  .mapchips{left:20px;top:20px;gap:8px}
+  .mapchips button{padding:9px 14px;font-size:14px}
+  .locbtn{right:20px;top:20px}
+}
 /* ---- lock */
 .lock{position:fixed;inset:0;z-index:50;padding:calc(env(safe-area-inset-top,0px) + 24px) 20px calc(env(safe-area-inset-bottom,0px) + 24px);overflow:auto;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(120% 70% at 50% 0%,color-mix(in srgb,var(--rose) 22%,var(--bg)) 0%,var(--bg) 60%)}
@@ -325,6 +454,8 @@ body.locked .tabs,body.locked .view{visibility:hidden}
 
 <!-- ============ HOME ============ -->
 <div id="view-home" class="view">
+<div class="homegrid">
+<div class="homelist">
   <div class="topblock">
     <div class="hdrrow">
       <div class="wm">Date <em>Spot</em></div>
@@ -332,13 +463,13 @@ body.locked .tabs,body.locked .view{visibility:hidden}
     </div>
     <div class="searchrow">
       <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg><input id="q" type="search" placeholder="Bars, food, vibe" aria-label="Search" autocomplete="off"></label>
-      <button class="iconbtn" id="filtersBtn" type="button" aria-label="Filters"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg><span class="badge" id="filterBadge" hidden></span></button>
+      <button class="iconbtn" id="filtersBtn" type="button" aria-label="Filters"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg><span class="deskonly fbl">Filters</span><span class="badge" id="filterBadge" hidden></span></button>
     </div>
     <div class="modeseg"><div class="seg" role="group" aria-label="Bars or places"><button type="button" data-mode="night" aria-pressed="true">Bars</button><button type="button" data-mode="day" aria-pressed="false">Places</button></div></div>
     <div class="occrow" id="occrow"></div>
     <div class="pchip"><button class="occ" id="pchip" type="button" hidden>Sorted for non-drinkers</button></div>
     <div class="metarow">
-      <span><span id="count"></span> <span id="countNoun">bars</span><span id="fromWrap"> from <button class="origin" type="button" data-origin="1" id="originHome"></button></span></span>
+      <span><span id="count"></span> <span id="countNoun">bars</span><span class="deskonly"> · hover a card to find it on the map</span><span id="fromWrap"> from <button class="origin" type="button" data-origin="1" id="originHome"></button></span></span>
       <span><button class="linkbtn" id="expall" type="button" hidden>Expand all</button></span>
       <select class="sortsel" id="sort" aria-label="Sort">
         <option value="score">Best for a date</option>
@@ -351,6 +482,9 @@ body.locked .tabs,body.locked .view{visibility:hidden}
   <div id="pickbanner" hidden></div>
   <div id="list"></div>
 </div>
+<div class="homemap deskonly" id="homeMapHost"></div>
+</div>
+</div>
 
 <!-- ============ PLAN ============ -->
 <div id="view-plan" class="view safe" hidden>
@@ -358,7 +492,7 @@ body.locked .tabs,body.locked .view{visibility:hidden}
     <div class="wm-sm">Date <em>Spot</em></div>
   </div>
   <div class="pillrow" style="padding-top:12px"><div class="seg" style="margin:0;flex:1" role="group" aria-label="Night or day"><button type="button" data-mode="night" aria-pressed="true">Night</button><button type="button" data-mode="day" aria-pressed="false">Day</button></div></div>
-  <div class="prompt" id="prompt">What kind of<br><em>night</em> is it?</div>
+  <div class="planhead"><div class="prompt" id="prompt">What kind of<br><em>night</em> is it?</div><div class="planbtn deskonly"></div></div>
   <div class="pillrow"><span class="pillsel"><select id="seqSel" aria-label="How many stops"><option value="one">Just one stop</option><option value="dd">Drinks → Dinner</option><option value="dr">Dinner → Drinks</option><option value="ddl">Drinks → Dinner → Late night</option><option value="cwl">Coffee → Walk → Lunch</option><option value="mc">Museum → Coffee</option><option value="ds">Dinner → Show</option><option value="sd">Show → Drinks</option></select></span><span class="pillsel"><select id="planDay" aria-label="When"></select></span></div>
   <div class="pillrow" style="padding-top:8px"><button class="pill muted" type="button" data-origin="start">◎ <span class="fromword">from </span><span class="originlbl"></span></button><button class="pill muted" type="button" data-origin="end">⌂ <span class="endlbl"></span></button></div>
   <div class="tiles" id="tiles"></div>
@@ -370,40 +504,56 @@ body.locked .tabs,body.locked .view{visibility:hidden}
 
 <!-- ============ SHORTLIST ============ -->
 <div id="view-short" class="view safe" hidden>
-  <div style="padding:10px 20px 0"><div class="wm">Short<em>list</em></div><div class="sub" id="shortSub"></div></div>
-  <div class="seg" role="group" aria-label="Sort shortlist"><button type="button" id="shNear" aria-pressed="true">Nearest first</button><button type="button" id="shBest" aria-pressed="false">Highest rated</button></div>
+  <div class="shhead"><div style="padding:10px 20px 0"><div class="wm">Short<em>list</em></div><div class="sub" id="shortSub"></div></div>
+  <div class="seg" role="group" aria-label="Sort shortlist"><button type="button" id="shNear" aria-pressed="true">Nearest first</button><button type="button" id="shBest" aria-pressed="false">Highest rated</button></div></div>
   <div id="shortlist" style="margin-top:10px"></div>
   <div class="suggestrow"><button class="chip" id="suggestBtn" type="button">Suggest a spot</button><span>Know somewhere that belongs here? Send it in.</span></div>
 </div>
 
 <!-- ============ TONIGHT ============ -->
 <div id="view-tonight" class="view safe" hidden>
+<div class="tngrid">
+<div class="tn-left">
   <div class="tn-hdr"><div class="wm">Date</div><button class="linkbtn" type="button" id="sharePlan">Share</button></div>
   <div class="tn-sub">Stops in order, with when you'd arrive. Plan it on the Plan tab, or tap + on a saved place.</div>
   <div class="pillrow" style="padding-top:12px"><span class="pillsel"><select id="startAt" aria-label="Start time"></select></span><span class="pillsel"><select id="planDay2" aria-label="When"></select></span></div>
   <div class="plancard" id="plancard"></div>
   <div id="ideas"></div>
+</div>
+<div class="tn-right">
   <div class="eb2" id="savedEb">Saved · 0</div>
   <div id="savedrows"></div>
+</div>
+</div>
 </div>
 
 <!-- ============ MAP ============ -->
 <div id="view-map" class="view safe" hidden>
-  <div class="mappanel">
-    <div id="map" aria-label="Map of bars"></div>
-    <div class="mapchips"><button type="button" id="mapOcc">All</button><button type="button" id="mapCap" aria-pressed="false">≤ 20 min</button></div>
-    <button class="locbtn" id="locate" type="button" aria-label="Use my location"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path><circle cx="12" cy="12" r="5"></circle></svg></button>
-  </div>
+<div class="mapgrid">
+<div class="mapleft">
   <div class="maplisthdr"><b id="mapListTitle">Closest to you</b><button class="origin" type="button" data-origin="1" style="font-size:13px"><span class="fromword">from </span><span class="originlbl"></span></button></div>
   <div class="maplist noscroll" id="maplist"></div>
 </div>
+<div class="mapslot" id="mapSlot">
+  <div class="mappanel" id="mappanel">
+    <div id="map" aria-label="Map of bars"></div>
+    <div class="mapchips"><button type="button" id="mapOcc">All</button><button type="button" id="mapCap" aria-pressed="false">≤ 20 min</button><button type="button" id="mapOpen" aria-pressed="false" class="deskonly">Open now</button></div>
+    <div class="mapprev deskonly" id="mapPreview" hidden></div>
+    <button class="locbtn" id="locate" type="button" aria-label="Use my location"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path><circle cx="12" cy="12" r="5"></circle></svg></button>
+  </div>
+</div>
+</div>
+</div>
 
 <nav class="tabs" aria-label="Sections">
+  <div class="sidewm deskonly">Date <em>Spot</em></div>
   <button type="button" id="tab-short" aria-current="false"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3 1.6-1.8 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z" fill="currentColor"></path></svg><span>Shortlist <b id="tabShortN"></b></span></button>
   <button type="button" id="tab-plan" aria-current="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"></rect><circle cx="9" cy="9" r="1.3" fill="currentColor"></circle><circle cx="15" cy="15" r="1.3" fill="currentColor"></circle><circle cx="15" cy="9" r="1.3" fill="currentColor"></circle><circle cx="9" cy="15" r="1.3" fill="currentColor"></circle></svg><span>Plan</span></button>
   <button type="button" id="tab-home" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z" fill="currentColor"></path></svg><span>Home</span></button>
   <button type="button" id="tab-tonight" aria-current="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path><path d="M12 18.2s-3-1.9-3-3.8a1.5 1.5 0 0 1 3-.6 1.5 1.5 0 0 1 3 .6c0 1.9-3 3.8-3 3.8z" fill="currentColor" stroke="none"></path></svg><span>Date</span></button>
   <button type="button" id="tab-map" aria-current="false"><svg viewBox="0 0 24 24"><path d="M12 22s7-7.1 7-12.5A7 7 0 0 0 5 9.5C5 14.9 12 22 12 22zm0-9.5a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill="currentColor"></path></svg><span>Map</span></button>
+  <div class="sidespacer deskonly"></div>
+  <button class="sideorigin deskonly" type="button" data-origin="start">Distances from<br><span class="originlbl"></span></button>
 </nav>
 
 <!-- ============ FILTERS SHEET ============ -->
@@ -551,7 +701,7 @@ hoodEl.addEventListener("change",()=>{hood=hoodEl.value;update();});
 [ftypeEl,resvEl,dayEl,fourEl,newEl,unvEl,openNowEl,openLateEl].forEach(e=>e.addEventListener("change",()=>update()));
 sortEl.addEventListener("change",()=>{store.set("datebars-sort",sortEl.value);update();});
 {const s=store.get("datebars-sort",null);if(s&&[...sortEl.options].some(o=>o.value===s))sortEl.value=s;}
-qEl.addEventListener("input",()=>renderHome());
+qEl.addEventListener("input",()=>{renderHome();});
 const priceOn=new Set(),featOn=new Set(),cuisOn=new Set();
 const FEATS=["speakeasy","rooftop","quiet","loud","live music","dancing","view","outdoor","happy hour","late night","dress code"];
 const CUIS=["American","Wine bar","Cheese & charcuterie","Seafood / raw bar","Japanese / sushi","Italian","French","Pub / British","Latin","Mediterranean","Mexican","Korean","Spanish","Vegan / veggie","Vietnamese","Chinese","Dessert","Cafe"];
@@ -571,7 +721,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-occ]");if(
 function paintOcc(){occasion=occGet();document.querySelectorAll("[data-occ]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.occ===occasion));$("mapOcc").textContent=occLabel(occasion);}
 function setMode(m){mode=m==="day"?"day":"night";store.set("datebars-mode",mode);buildOcc();update();}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-mode]");if(b)setMode(b.dataset.mode);});
-function paintMode(){document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===mode));$("prompt").innerHTML=mode==="day"?"What kind of<br><em>day</em> is it?":"What kind of<br><em>night</em> is it?";$("countNoun").textContent=mode==="day"?"places":"bars";}
+function paintMode(){document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===mode));$("prompt").innerHTML=mode==="day"?"What kind of <br><em>day</em> is it?":"What kind of <br><em>night</em> is it?";$("countNoun").textContent=mode==="day"?"places":"bars";}
 
 // ---------- sheets ----------
 function openSheet(id){$(id).hidden=false;}
@@ -663,11 +813,12 @@ function groupKey(r,s){if(!hasOrigin()&&s==="dist")s="score";if(s==="score")retu
 // ---------- pieces ----------
 function heartBtn(r,cls){return `<button class="heart ${cls||""}" type="button" data-save="${r.id}" aria-pressed="${picks.has(r.id)}" aria-label="${picks.has(r.id)?"Saved":"Save"}">${HEART}</button>`;}
 function dirLink(r,cls,label){return `<a class="${cls}" href="${dirUrl(r)}" target="_blank" rel="noopener">${label}</a>`;}
-function card(r){
-  const d=document.createElement("article");d.className="bar"+(r.status==="closed"?" closed":"");d.dataset.id=r.id;d.setAttribute("role","button");d.tabIndex=0;
+function card(r,idx){
+  const d=document.createElement("article");d.className="bar"+(r.status==="closed"?" closed":"")+(hlId===r.id?" hl":"");d.dataset.id=r.id;d.setAttribute("role","button");d.tabIndex=0;
+  d.onmouseenter=()=>{if(isDesktop())setHl(r.id,false);};
   const note=notes[r.id];
   const badges=[r.zp==="strong"?"zero-proof ✓":r.zp==="some"?"NA options":"",r.kind==="bar"&&r.cuis.includes("Vegan / veggie")&&(prof("diet")||[]).some(x=>/veg/.test(x))?"veg-friendly":""].filter(Boolean);
-  d.innerHTML=`<div class="top"><div><h2 class="name">${r.name}${r.status?`<span class="tag ${r.status}">${r.status}</span>`:""}</h2><div class="meta">${r.hood} · ${r.cost===1&&r.kind==="place"?"free or cheap":"$".repeat(r.cost)} · ${r.type}</div></div>${heartBtn(r)}</div>
+  d.innerHTML=`${idx!=null?`<span class="rank">${idx+1}</span>`:""}<div class="top"><div><h2 class="name">${r.name}<span class="inlh deskonly">${hearts(r.score)}</span>${r.status?`<span class="tag ${r.status}">${r.status}</span>`:""}</h2><div class="meta">${r.hood} · ${r.cost===1&&r.kind==="place"?"free or cheap":"$".repeat(r.cost)} · ${r.type}</div></div>${heartBtn(r)}</div>
     <p class="desc">${r.why}</p>
     ${note?`<p class="note1">“${esc(note)}”</p>`:""}
     <div class="bottom"><div class="tags">${badges.map(b=>`<span class="zp">${b}</span>`).join("")}${r.feats.slice(0,2).map(f=>`<span>${f}</span>`).join("")}</div><div class="right">${r.rurl?`<a class="rsv" href="${r.rurl}" target="_blank" rel="noopener">${r.kind==="place"?"Tickets":"Reserve"} ↗</a>`:""}${dirLink(r,"dirbtn",ARROW+(hasOrigin()?distTxt(r):"Directions"))}</div></div>`;
@@ -700,7 +851,7 @@ sortEl.addEventListener("change",()=>{openGroups.clear();expandAll=false;});
 $("expall").onclick=()=>{expandAll=!expandAll;openGroups.clear();renderHome();};
 function renderHome(){
   const rows=filtered(),s=sortEl.value;shown=rows;
-  const collapsible=rows.length>10&&!qEl.value.trim();
+  const collapsible=!isDesktop()&&rows.length>10&&!qEl.value.trim();
   $("expall").hidden=!collapsible;$("expall").textContent=expandAll?"Collapse all":"Expand all";
   $("count").textContent=rows.length;
   const pz=$("pchip");if(mode==="day"){pz.hidden=true;}else if(sinkDrinks()){pz.hidden=false;pz.setAttribute("aria-pressed","true");}else if(prof("drink")&&prof("drink")!=="drink"){pz.hidden=false;pz.setAttribute("aria-pressed","false");}else pz.hidden=true;
@@ -714,7 +865,8 @@ function renderHome(){
       const m=k.match(/^([♥♡]+) (.*)$/);t.innerHTML=(m?`<span class="h">${m[1]} ${m[2]}</span>`:`<span class="h" style="color:var(--ink);letter-spacing:0">${esc(k)}</span>`)+`<span class="n">${counts[k]}</span>`+(collapsible?'<span class="chev">›</span>':"");
       if(collapsible){const key=k;t.onclick=()=>{if(expandAll){expandAll=false;openGroups=new Set(Object.keys(counts).filter(x=>x!==key));}else openGroups.has(key)?openGroups.delete(key):openGroups.add(key);renderHome();};}
       list.appendChild(t);wrap=document.createElement("div");wrap.className="cards";list.appendChild(wrap);}
-    if(open)wrap.appendChild(card(r));});
+    if(open)wrap.appendChild(card(r,rows.indexOf(r)));});
+  if(isDesktop()&&map)renderMap();
   const pb=$("pickbanner");const pr=picked&&byId.get(picked);
   if(pr){pb.hidden=false;pb.innerHTML=`<div class="pickbanner" data-id="${pr.id}"><div><div class="eyebrow">Tonight's pick</div><div class="nm">${pr.name}</div><div class="sm">${dot(pr.hood,distTxt(pr))}</div></div><button class="x" type="button" data-clearpick="1" aria-label="Dismiss">×</button></div>`;}else{pb.hidden=true;pb.innerHTML="";}
 }
@@ -733,7 +885,7 @@ function autoPlan(){const slots=seqSlots();if(!slots.length){pickOne();return;}c
     if(!cand.length)cand=slotRows(slots[i],null,null).filter(r=>!stops.includes(r));if(!cand.length)break;
     if(i===slots.length-1&&hasEnd())cand=cand.slice(0,12).sort((a,b)=>walkMin(a.pt,endPt)-walkMin(b.pt,endPt));
     const top=cand.slice(0,5);const pick=top[Math.floor(Math.random()*top.length)];stops.push(pick);const walk=last?walkMin(last.pt,pick.pt):0;t+=walk+(DWELL[pick.type]||60);}
-  plan=stops.map(r=>r.id);stops.forEach(r=>picks.add(r.id));savePicks();savePlan();picked=null;update();$("view-plan").scrollTop=0;window.scrollTo({top:$("pickcard").offsetTop-80,behavior:"smooth"});}
+  plan=stops.map(r=>r.id);stops.forEach(r=>picks.add(r.id));savePicks();savePlan();picked=null;update();if(!isDesktop())window.scrollTo({top:$("pickcard").offsetTop-80,behavior:"smooth"});}
 function renderPlanTab(){
   paintMode();const base=baseRows();
   OCC().forEach(([k])=>{const el=document.querySelector(`[data-n="${k}"]`);if(el){const n=occRows(base,k).length;el.textContent=n+(n===1?(mode==="day"?" place":" bar"):(mode==="day"?" places":" bars"));}});
@@ -821,9 +973,21 @@ document.addEventListener("click",async e=>{
 function paintSaves(){document.querySelectorAll("[data-save]").forEach(x=>{const on=picks.has(x.dataset.save);x.setAttribute("aria-pressed",on);if(x.classList.contains("act"))x.textContent=on?"Saved ♥":"Save ♡";else x.setAttribute("aria-label",on?"Saved":"Save");});}
 function refreshDetail(){if(!detailId)return;const st=$("detail").querySelector(".box").scrollTop;const ta=$("detail").querySelector("textarea");const v=ta?ta.value:null;$("detailBody").innerHTML=detailHtml(byId.get(detailId));if(v!==null){const t2=$("detail").querySelector("textarea");if(t2)t2.value=v;}$("detail").querySelector(".box").scrollTop=st;}
 
+// ---------- desktop layout ----------
+const isDesktop=()=>window.innerWidth>=900;
+function layout(){const desk=isDesktop();
+  const q=x=>document.querySelector(x);const pb=$("pickBtn");if(desk&&pb.parentElement!==q(".searchrow"))q(".searchrow").appendChild(pb);else if(!desk&&pb.parentElement!==q(".hdrrow"))q(".hdrrow").appendChild(pb);
+  const pb2=$("pickBtn2"),slot2=q("#view-plan div[style*=\"padding:14px 20px 0\"]");if(desk&&pb2.parentElement!==q(".planbtn"))q(".planbtn").appendChild(pb2);else if(!desk&&pb2.parentElement===q(".planbtn"))slot2.appendChild(pb2);
+  const panel=$("mappanel");const home=desk&&view==="home";
+  if(home&&panel.parentElement!==$("homeMapHost"))$("homeMapHost").appendChild(panel);else if(!home&&panel.parentElement!==$("mapSlot"))$("mapSlot").appendChild(panel);
+  if(home){openMap();}else if(map)setTimeout(()=>map.invalidateSize(),60);}
+window.addEventListener("resize",()=>{layout();renderHome();});
+function setHl(id,scroll){hlId=id;if(map&&isDesktop()&&map.getZoom()<13.25){renderMap();}document.querySelectorAll("article.bar").forEach(a=>a.classList.toggle("hl",a.dataset.id===id));document.querySelectorAll(".mrow").forEach(a=>a.classList.toggle("hl",a.dataset.id===id));document.querySelectorAll(".pin[data-detail]").forEach(p=>p.classList.toggle("hl",p.dataset.detail===id));
+  const r=byId.get(id);const pv=$("mapPreview");if(r&&isDesktop()){pv.hidden=false;pv.innerHTML=`<div style="flex:1;min-width:0"><div class="nm">${r.name}</div><div class="sm">${dot(r.hood,distTxt(r),r.kind==="bar"?book(r):r.type)}</div></div><a href="${dirUrl(r)}" target="_blank" rel="noopener">Directions</a>`;}else pv.hidden=true;
+  if(scroll){const el=document.querySelector(`article.bar[data-id="${id}"],.mrow[data-id="${id}"]`);if(el)el.scrollIntoView({block:"center",behavior:"smooth"});}}
 // ---------- tabs ----------
 const VIEWS=["short","plan","home","tonight","map"];let view="home";
-function showView(v){view=v;VIEWS.forEach(x=>{$("view-"+x).hidden=x!==v;$("tab-"+x).setAttribute("aria-current",x===v?"page":"false");});store.set("datebars-tab",v);window.scrollTo(0,0);if(v==="map")openMap();}
+function showView(v){view=v;VIEWS.forEach(x=>{$("view-"+x).hidden=x!==v;$("tab-"+x).setAttribute("aria-current",x===v?"page":"false");});store.set("datebars-tab",v);window.scrollTo(0,0);layout();if(v==="map")openMap();if(map)renderMap();}
 VIEWS.forEach(x=>$("tab-"+x).onclick=()=>showView(x));
 window.addEventListener("scroll",()=>document.body.classList.toggle("scrolled",window.scrollY>28),{passive:true});
 
@@ -859,7 +1023,7 @@ async function openMap(){
     map.attributionControl.setPrefix(false).addAttribution('Map data &copy; OpenStreetMap contributors, NYC Open Data');
     cv=L.canvas({padding:.5});
     map.setMaxBounds(L.latLngBounds(G.land.flat()).pad(.35));
-    map.fitBounds(L.latLngBounds(ALL.map(r=>r.pt)),{padding:[24,24]});
+    const fitRows=isDesktop()?(shown.length?shown:ALL):ALL;map.fitBounds(L.latLngBounds(fitRows.map(r=>r.pt)),{padding:[24,24]});
     buildBase();
     pinLayer=L.layerGroup().addTo(map);planLayer=L.layerGroup().addTo(map);
     renderMap();
@@ -868,25 +1032,28 @@ async function openMap(){
 }
 function fitHood(h){const pts=ALL.filter(r=>h==="All"||r.hood===h).map(r=>r.pt);if(pts.length)map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:16});}
 $("mapCap").onclick=()=>{mapCap=!mapCap;$("mapCap").setAttribute("aria-pressed",mapCap);renderMap();};
+$("mapOpen").onclick=()=>{openNowEl.checked=!openNowEl.checked;$("mapOpen").setAttribute("aria-pressed",openNowEl.checked);update();};
 $("mapOcc").onclick=()=>{showView("plan");};
 $("locate").onclick=()=>{locate(p=>{const pt=[p.coords.latitude,p.coords.longitude];if(meMarker)meMarker.setLatLng(pt);else meMarker=L.marker(pt,{icon:L.divIcon({className:"",html:'<span class="pin me"></span>',iconSize:null}),interactive:false,keyboard:false}).addTo(map);map.setView(pt,15);setOrigin(pt,"my location");},()=>{$("maplist").insertAdjacentHTML("afterbegin",'<div class="hint" style="padding:6px 22px">Location blocked. Allow it in Settings.</div>');});};
 function renderMap(){
   if(!map)return;pinLayer.clearLayers();planLayer.clearLayers();
-  let rows=sortRows(occRows(baseRows(),occasion),"dist");if(mapCap&&hasOrigin())rows=rows.filter(r=>r.tr.min<=20);mapRows=rows;$("mapListTitle").textContent=hasOrigin()?"Closest to you":"Highest rated";$("mapCap").hidden=!hasOrigin();
+  let rows=(isDesktop()&&view==="home")?shown.slice():sortRows(occRows(baseRows(),occasion),"dist");if(mapCap&&hasOrigin()&&!(isDesktop()&&view==="home"))rows=rows.filter(r=>r.tr.min<=20);mapRows=rows;if(isDesktop()&&(!hlId||!rows.some(r=>r.id===hlId))&&rows.length)hlId=rows[0].id;$("mapListTitle").textContent=hasOrigin()?"Closest to you":"Highest rated";$("mapCap").hidden=!hasOrigin();
   const z=map.getZoom();
-  if(z<13.75){ // clusters by neighborhood
+  if(z<(isDesktop()?13.25:13.75)){ // clusters by neighborhood
     const g={};rows.forEach(r=>(g[r.hood]=g[r.hood]||[]).push(r));
     Object.keys(g).forEach(h=>{const pts=g[h].map(r=>r.pt);const c=[pts.reduce((a,p)=>a+p[0],0)/pts.length,pts.reduce((a,p)=>a+p[1],0)/pts.length];L.marker(c,{icon:L.divIcon({className:"",html:`<span class="cluster${pts.length>=15?" big":""}" title="${esc(h)}"><b>${pts.length}</b>${z>=12.5?`<small>${esc(h)}</small>`:""}</span>`,iconSize:null}),keyboard:false,zIndexOffset:pts.length}).on("click",()=>{fitHood(h);}).addTo(pinLayer);});
+    const hr=isDesktop()&&hlId&&rows.find(r=>r.id===hlId);if(hr){const i=rows.indexOf(hr);L.marker(hr.pt,{icon:L.divIcon({className:"",html:`<span class="pin hl" data-detail="${hr.id}">${i+1}</span>`,iconSize:null}),zIndexOffset:2000,keyboard:false}).on("click",()=>setHl(hr.id,true)).addTo(pinLayer);}
   }else{
-    rows.forEach((r,i)=>{L.marker(r.pt,{icon:L.divIcon({className:"",html:`<span class="pin${i<3?" top":""}" data-detail="${r.id}">${i+1}</span>`,iconSize:null}),zIndexOffset:i<3?500:0,keyboard:false}).on("click",()=>{hlId=r.id;paintMapList();const row=document.querySelector(`.mrow[data-id="${r.id}"]`);if(row)row.scrollIntoView({block:"center",behavior:"smooth"});}).addTo(pinLayer);});
+    rows.forEach((r,i)=>{const mk=L.marker(r.pt,{icon:L.divIcon({className:"",html:`<span class="pin${i<3&&!isDesktop()?" top":""}${hlId===r.id?" hl":""}" data-detail="${r.id}">${i+1}</span>`,iconSize:null}),zIndexOffset:hlId===r.id?900:(i<3?500:0),keyboard:false});mk.on("click",()=>{setHl(r.id,true);});mk.on("mouseover",()=>{if(isDesktop())setHl(r.id,true);});mk.addTo(pinLayer);});
   }
   const stops=plan.map(id=>byId.get(id)).filter(Boolean);
   if(stops.length>1)L.polyline(stops.map(r=>r.pt),{renderer:cv,interactive:false,color:cssVar("--rose"),weight:2.5,opacity:.9,dashArray:"6 6"}).addTo(planLayer);
   paintMapList();
 }
+$("maplist").addEventListener("mouseover",e=>{const row=e.target.closest(".mrow");if(row&&isDesktop()&&row.dataset.id!==hlId)setHl(row.dataset.id,false);});
 function paintMapList(){
   const rows=mapRows;
-  $("maplist").innerHTML=rows.length?rows.map((r,i)=>`<div class="mrow${hlId===r.id?" hl":""}" data-id="${r.id}"><span class="rank" style="${i<3?"border-color:var(--rose);color:var(--rose)":""}">${i+1}</span><div style="flex:1;min-width:0"><div class="nm">${r.name}</div><div class="sm">${r.hood} · <b>${hearts(r.score)}</b></div></div>${hasOrigin()?`<span class="d">${r.tr.min} min<small>${r.tr.mode}</small></span>`:`<span class="d">${"$".repeat(r.cost)}</span>`}</div>`).join(""):'<div class="empty">Nothing matches here. Loosen a filter or turn off ≤ 20 min.</div>';
+  $("maplist").innerHTML=rows.length?rows.map((r,i)=>`<div class="mrow${hlId===r.id?" hl":""}" data-id="${r.id}" onmouseenter=""><span class="rank" style="${i<3?"border-color:var(--rose);color:var(--rose)":""}">${i+1}</span><div style="flex:1;min-width:0"><div class="nm">${r.name}</div><div class="sm">${r.hood} · <b>${hearts(r.score)}</b></div></div>${hasOrigin()?`<span class="d">${r.tr.min} min<small>${r.tr.mode}</small></span>`:`<span class="d">${"$".repeat(r.cost)}</span>`}</div>`).join(""):'<div class="empty">Nothing matches here. Loosen a filter or turn off ≤ 20 min.</div>';
 }
 darkMq.addEventListener("change",()=>{if(map){location.reload();}});
 
@@ -919,7 +1086,7 @@ $("suggestBtn").onclick=()=>{openSheet("sheet");$("sgMsg").textContent="";$("sgN
 $("sgFrom").value=store.get("datebars-from","")||"";
 $("sgSend").onclick=async()=>{const name=$("sgName").value.trim();if(!name){$("sgMsg").textContent="Give the spot a name first.";return;}const from=$("sgFrom").value.trim();store.set("datebars-from",from);const h=$("sgHood").value,why=$("sgWhy").value.trim();const text=["Date Spot suggestion"+(from?" from "+from:"")+":",name+(h?" ("+h+")":""),why].filter(Boolean).join("\n");if(navigator.share){try{await navigator.share({title:"Date Spot suggestion",text});closeSheet("sheet");$("sgName").value="";$("sgWhy").value="";}catch(err){}}else{try{await navigator.clipboard.writeText(text);$("sgMsg").textContent="Copied to your clipboard. Text it to whoever shared the app with you.";}catch(err){$("sgMsg").textContent="Couldn't open sharing. Copy this and text it: "+text;}}};
 
-buildOcc();update();
+buildOcc();update();layout();
 {const t=store.get("datebars-tab","home");if(VIEWS.includes(t)&&t!=="home")showView(t);}
 if(!profile)setTimeout(()=>openOnboard(0),400);
 }
