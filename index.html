@@ -289,7 +289,9 @@ body.locked .tabs,body.locked .view{visibility:hidden}
 .dacts{display:flex;gap:8px;flex-wrap:wrap}
 .act{display:inline-block;border:1px solid var(--strong);background:var(--bg);color:var(--ink);border-radius:999px;padding:7px 13px;font:inherit;font-size:14px;line-height:1.3;text-decoration:none;cursor:pointer;white-space:nowrap}
 .act[aria-pressed="true"]{background:var(--rose);border-color:var(--rose);color:var(--bg)}
-.act.primary{background:var(--rose);color:var(--bg);border-color:var(--rose);font-weight:600}
+.ico{width:14px;height:14px;vertical-align:-2px;margin-right:2px;display:inline-block;color:var(--rose)}
+.act.primary{background:var(--rose);color:var(--bg);border-color:var(--rose);font-weight:600;width:auto;height:auto;display:inline-block;border-radius:999px;font-size:14px;padding:7px 13px;transition:none}
+.act.primary:active{transform:none}
 .dbox .why{font-size:16px;margin:0;line-height:1.4}
 .dbox .food{margin:0;font-size:14px;color:var(--muted)}
 .dbox .food .fl{color:var(--amber);font-weight:600;margin-right:4px}
@@ -526,7 +528,7 @@ body.locked .tabs,body.locked .view{visibility:hidden}
   <div class="planhead"><div class="prompt" id="prompt">What kind of<br><em>night</em> is it?</div><div class="planbtn deskonly"></div></div>
   <div class="pillrow"><span class="pillsel"><select id="planDay" aria-label="When"></select></span></div>
   <div class="stops" id="stops"></div>
-  <div class="pillrow" style="padding-top:8px"><button class="pill muted" type="button" data-origin="start">◎ <span class="fromword">from </span><span class="originlbl"></span></button><button class="pill muted" type="button" data-origin="end">⌂ <span class="endlbl"></span></button></div>
+  <div class="pillrow" style="padding-top:8px"><button class="pill muted" type="button" data-origin="start"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg><span class="fromword">from </span><span class="originlbl"></span></button><button class="pill muted" type="button" data-origin="end"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path></svg><span class="endlbl"></span></button></div>
   <div class="tiles" id="tiles"></div>
   <div style="padding:14px 20px 0"><button class="primary" id="pickBtn2" type="button">Pick one for me</button></div>
   <div id="pickcard" hidden></div>
@@ -880,13 +882,13 @@ function card(r,idx){
   d.innerHTML=`${idx!=null?`<span class="rank">${idx+1}</span>`:""}<div class="top"><div><h2 class="name">${r.name}<span class="inlh deskonly">${hearts(r.score)}</span>${r.status?`<span class="tag ${r.status}">${r.status}</span>`:""}</h2><div class="meta">${r.hood} · ${r.cost===1&&r.kind==="place"?"free or cheap":"$".repeat(r.cost)} · ${r.type}</div></div>${heartBtn(r)}</div>
     <p class="desc">${r.why}</p>
     ${note?`<p class="note1">“${esc(note)}”</p>`:""}
-    <div class="bottom"><div class="tags">${badges.map(b=>`<span class="zp">${b}</span>`).join("")}${r.feats.slice(0,2).map(f=>`<span>${f}</span>`).join("")}</div><div class="right">${r.rurl?`<a class="rsv" href="${r.rurl}" target="_blank" rel="noopener">${r.kind==="place"?"Tickets":"Reserve"} ↗︎</a>`:""}${dirLink(r,"dirbtn",ARROW+(hasOrigin()?distTxt(r):"Directions"))}</div></div>`;
+    <div class="bottom"><div class="tags">${badges.map(b=>`<span class="zp">${b}</span>`).join("")}${r.feats.slice(0,2).map(f=>`<span>${f}</span>`).join("")}</div><div class="right">${r.rurl?`<a class="rsv" href="${r.rurl}" target="_blank" rel="noopener">${r.kind==="place"?"Tickets":"Reserve"}</a>`:""}${dirLink(r,"dirbtn",ARROW+(hasOrigin()?distTxt(r):"Directions"))}</div></div>`;
   return d;
 }
 function detailHtml(r){
   const note=notes[r.id]||"",now=new Date(),st=openState(r,now);
   return `<div class="dtop"><div><h2>${r.name}</h2><div class="dsub">${r.hood} · ${r.where}${r.status?` · <span class="tag ${r.status}">${r.status}</span>`:""}</div></div><div><span class="score ${r.score<4?"lo":""}">${hearts(r.score)}</span> <b>${"$".repeat(r.cost)}</b></div></div>
-    <div class="dacts">${r.rurl?`<a class="act primary" href="${r.rurl}" target="_blank" rel="noopener">${r.kind==="place"?"Tickets":"Reserve"} ↗︎</a>`:""}${r.url?`<a class="act" href="${r.url}" target="_blank" rel="noopener">Site ↗︎</a>`:""}<a class="act" href="${appleUrl(r)}" target="_blank" rel="noopener">Apple Maps ↗︎</a><a class="act" href="${gmapUrl(r)}" target="_blank" rel="noopener">Google Maps ↗︎</a></div>
+    <div class="dacts">${r.rurl?`<a class="act primary" href="${r.rurl}" target="_blank" rel="noopener">${r.kind==="place"?"Tickets":"Reserve"}</a>`:""}${r.url?`<a class="act" href="${r.url}" target="_blank" rel="noopener">Site</a>`:""}<a class="act" href="${appleUrl(r)}" target="_blank" rel="noopener">Apple Maps</a><a class="act" href="${gmapUrl(r)}" target="_blank" rel="noopener">Google Maps</a></div>
     <div class="dacts"><button class="act" type="button" data-save="${r.id}" aria-pressed="${picks.has(r.id)}">${picks.has(r.id)?"Saved ♥":"Save ♡"}</button><button class="act" type="button" data-plan="${r.id}" aria-pressed="${plan.includes(r.id)}">${plan.includes(r.id)?"In the date ✓":"Add to date"}</button><button class="act" type="button" data-share="${r.id}">Share</button></div>
     <p class="why">${r.why}</p>
     <p class="food"><span class="fl">${r.type}</span> ${r.food}</p>
@@ -954,7 +956,7 @@ function renderPlanTab(){
   if(slots.length&&stops.length){ // itinerary summary on Plan
     const it=itinerary();pc.hidden=false;pc.innerHTML=`<div class="pickcard"><div class="eb">${stops.length>=slots.length?"Your date is set":"Stop "+(stops.length+1)+" next: "+SLOTS[slots[stops.length]].label}</div>${it.map((x,i)=>`<div class="sm" style="margin-top:6px"><b style="color:var(--ink)">${i+1}. ${x.r.name}</b> · ${clock(x.arrive)} · ${x.r.type}${x.warn?` · <span style="color:var(--rose)">${esc(x.warn)}</span>`:""}</div>`).join("")}<div class="acts2"><button class="act primary" type="button" id="goDate">Open the Date tab</button><button class="act" type="button" id="replan">Plan it again</button><button class="act" type="button" id="clearplan">Start over</button></div></div>`;
     pc.querySelector("#goDate").onclick=()=>showView("tonight");pc.querySelector("#replan").onclick=()=>autoPlan();pc.querySelector("#clearplan").onclick=()=>{plan=[];savePlan();update();};
-  }else if(pr){pc.hidden=false;pc.innerHTML=`<div class="pickcard" data-id="${pr.id}"><div class="eb">Go here</div><div class="nm">${pr.name}</div><div class="sm">${dot(pr.hood,distTxt(pr),pr.kind==="bar"?book(pr):pr.type)}</div><div class="ds">${pr.why}</div><div class="acts2"><button class="act primary" type="button" data-plan="${pr.id}" aria-pressed="${plan.includes(pr.id)}">${plan.includes(pr.id)?"In the date ✓":"Make it stop "+(plan.length+1)}</button>${dirLink(pr,"act","Directions ↗︎")}<button class="act" type="button" id="pickAgain">Another</button></div></div>`;pc.querySelector("#pickAgain").onclick=()=>pickOnePlan();}
+  }else if(pr){pc.hidden=false;pc.innerHTML=`<div class="pickcard" data-id="${pr.id}"><div class="eb">Go here</div><div class="nm">${pr.name}</div><div class="sm">${dot(pr.hood,distTxt(pr),pr.kind==="bar"?book(pr):pr.type)}</div><div class="ds">${pr.why}</div><div class="acts2"><button class="act primary" type="button" data-plan="${pr.id}" aria-pressed="${plan.includes(pr.id)}">${plan.includes(pr.id)?"In the date ✓":"Make it stop "+(plan.length+1)}</button>${dirLink(pr,"act","Directions")}<button class="act" type="button" id="pickAgain">Another</button></div></div>`;pc.querySelector("#pickAgain").onclick=()=>pickOnePlan();}
   else{pc.hidden=true;pc.innerHTML="";}
   $("pickBtn2").textContent=slots.length?"Plan it for me ("+slots.length+" stop"+(slots.length>1?"s":"")+")":"Pick one for me";
   // results: next slot when building a sequence by hand, otherwise the occasion
@@ -963,7 +965,7 @@ function renderPlanTab(){
   else{rows=planRows();title=occLabel(occPlan[planMode],planMode)+" "+planDayLabel();}
   $("railTitle").textContent=title;$("seeAll").textContent=slots.length&&stops.length<slots.length?"":"See all "+rows.length;
   const k=stops.length;
-  $("rail").innerHTML=rows.slice(0,8).map(r=>`<div class="rcard" data-id="${r.id}"><div class="top"><span class="h">${hearts(r.score)}</span>${heartBtn(r,"")}</div><div class="nm">${r.name}</div><div class="sm">${dot(r.hood,"$".repeat(r.cost),r.type,distTxt(r))}</div><div class="ds">${r.why}</div><div class="acts2"><button class="act${plan.includes(r.id)?" primary":""}" type="button" data-plan="${r.id}" aria-pressed="${plan.includes(r.id)}">${plan.includes(r.id)?"In the date ✓":(slots.length?"Add as stop "+(k+1):"Add to date")}</button>${dirLink(r,"act","Directions ↗︎")}</div></div>`).join("")||'<div class="empty">Nothing fits this slot nearby. Loosen a filter or plan it again.</div>';
+  $("rail").innerHTML=rows.slice(0,8).map(r=>`<div class="rcard" data-id="${r.id}"><div class="top"><span class="h">${hearts(r.score)}</span>${heartBtn(r,"")}</div><div class="nm">${r.name}</div><div class="sm">${dot(r.hood,"$".repeat(r.cost),r.type,distTxt(r))}</div><div class="ds">${r.why}</div><div class="acts2"><button class="act${plan.includes(r.id)?" primary":""}" type="button" data-plan="${r.id}" aria-pressed="${plan.includes(r.id)}">${plan.includes(r.id)?"In the date ✓":(slots.length?"Add as stop "+(k+1):"Add to date")}</button>${dirLink(r,"act","Directions")}</div></div>`).join("")||'<div class="empty">Nothing fits this slot nearby. Loosen a filter or plan it again.</div>';
 }
 function saveSlots(){store.set("datebars-slots",slots);}
 function renderStops(){const el=$("stops");const stops=plan.map(id=>byId.get(id)).filter(Boolean);
@@ -988,7 +990,7 @@ function renderShort(){
     <div class="sm">${dot(r.hood,"$".repeat(r.cost),book(r),distTxt(r))}</div>
     ${warn?`<div class="warn">${warn}</div>`:""}
     <div class="notebox ${note?"":"empty"}" data-noteedit="${r.id}" role="button" tabindex="0">${note?esc(note):"Add a note"}</div>
-    <div class="acts">${dirLink(r,"btn","Directions")}${r.rurl?`<a class="btn rsv2" href="${r.rurl}" target="_blank" rel="noopener">Reserve ↗︎</a>`:""}<button class="btn outline x" type="button" data-unsave="${r.id}" aria-label="Remove from shortlist">×</button></div></div>`;}).join("");
+    <div class="acts">${dirLink(r,"btn","Directions")}${r.rurl?`<a class="btn rsv2" href="${r.rurl}" target="_blank" rel="noopener">Reserve</a>`:""}<button class="btn outline x" type="button" data-unsave="${r.id}" aria-label="Remove from shortlist">×</button></div></div>`;}).join("");
 }
 document.addEventListener("click",e=>{
   const ne=e.target.closest("[data-noteedit]");if(ne){const id=ne.dataset.noteedit;const cur=notes[id]||"";const ed=document.createElement("div");ed.className="noteedit";ed.innerHTML=`<textarea rows="3" placeholder="Best table, what to order, who you went with…">${esc(cur)}</textarea><div class="row"><button class="chip small" type="button" data-notesave="${id}">Save note</button><button class="chip small" type="button" data-notecancel="1">Cancel</button></div>`;ne.replaceWith(ed);ed.querySelector("textarea").focus();return;}
@@ -1048,8 +1050,8 @@ function layout(){const desk=isDesktop();
   if(home&&panel.parentElement!==$("homeMapHost"))$("homeMapHost").appendChild(panel);else if(!home&&panel.parentElement!==$("mapSlot"))$("mapSlot").appendChild(panel);
   const moved=home?panel.parentElement===$("homeMapHost"):panel.parentElement===$("mapSlot");
   if(home){openMap().then(()=>{if(moved)setTimeout(()=>{map.invalidateSize();fitAll();},80);});}else if(map&&moved)setTimeout(()=>{map.invalidateSize();fitAll();},60);}
-window.addEventListener("resize",()=>{layout();renderHome();});
-function setHl(id,scroll){hlId=id;if(map&&isDesktop()&&map.getZoom()<13.25){renderMap();}document.querySelectorAll("article.bar").forEach(a=>a.classList.toggle("hl",a.dataset.id===id));document.querySelectorAll(".mrow").forEach(a=>a.classList.toggle("hl",a.dataset.id===id));document.querySelectorAll(".pin[data-detail]").forEach(p=>p.classList.toggle("hl",p.dataset.detail===id));
+let lastW=window.innerWidth,rsT=null;window.addEventListener("resize",()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(window.innerWidth===lastW)return;lastW=window.innerWidth;layout();renderHome();},150);});
+function setHl(id,scroll){if(hlId===id&&!scroll)return;const changed=hlId!==id;hlId=id;if(changed&&map&&isDesktop()&&map.getZoom()<14){renderMap();}document.querySelectorAll("article.bar").forEach(a=>a.classList.toggle("hl",a.dataset.id===id));document.querySelectorAll(".mrow").forEach(a=>a.classList.toggle("hl",a.dataset.id===id));document.querySelectorAll(".pin[data-detail]").forEach(p=>p.classList.toggle("hl",p.dataset.detail===id));
   const r=byId.get(id);const pv=$("mapPreview");if(r&&isDesktop()){pv.hidden=false;pv.innerHTML=`<div style="flex:1;min-width:0"><div class="nm">${r.name}</div><div class="sm">${dot(r.hood,distTxt(r),r.kind==="bar"?book(r):r.type)}</div></div><a href="${dirUrl(r)}" target="_blank" rel="noopener">Directions</a>`;}else pv.hidden=true;
   if(scroll){const el=document.querySelector(`article.bar[data-id="${id}"],.mrow[data-id="${id}"]`);if(el)el.scrollIntoView({block:"center",behavior:"smooth"});}}
 // ---------- tabs ----------
@@ -1108,12 +1110,12 @@ function renderMap(){
   if(!map)return;pinLayer.clearLayers();planLayer.clearLayers();
   let rows=(isDesktop()&&view==="home")?shown.slice():sortRows(occRows(baseRows(),occasion),"dist");if(mapCap&&hasOrigin()&&!(isDesktop()&&view==="home"))rows=rows.filter(r=>r.tr.min<=20);mapRows=rows;if(isDesktop()&&(!hlId||!rows.some(r=>r.id===hlId))&&rows.length)hlId=rows[0].id;$("mapListTitle").textContent=hasOrigin()?"Closest to you":"Highest rated";$("mapCap").hidden=!hasOrigin();
   const z=map.getZoom();
-  if(z<(isDesktop()?13.25:13.75)){ // clusters by neighborhood
+  if(z<(isDesktop()?14:13.75)){ // clusters by neighborhood
     const g={};rows.forEach(r=>(g[r.hood]=g[r.hood]||[]).push(r));
     Object.keys(g).forEach(h=>{const pts=g[h].map(r=>r.pt);const c=[pts.reduce((a,p)=>a+p[0],0)/pts.length,pts.reduce((a,p)=>a+p[1],0)/pts.length];L.marker(c,{icon:L.divIcon({className:"",html:`<span class="cluster${pts.length>=15?" big":""}" title="${esc(h)}"><b>${pts.length}</b>${z>=12.5?`<small>${esc(h)}</small>`:""}</span>`,iconSize:null}),keyboard:false,zIndexOffset:pts.length}).on("click",()=>{fitHood(h);}).addTo(pinLayer);});
     const hr=isDesktop()&&hlId&&rows.find(r=>r.id===hlId);if(hr){const i=rows.indexOf(hr);L.marker(hr.pt,{icon:L.divIcon({className:"",html:`<span class="pin hl" data-detail="${hr.id}">${i+1}</span>`,iconSize:null}),zIndexOffset:2000,keyboard:false}).on("click",()=>setHl(hr.id,true)).addTo(pinLayer);}
   }else{
-    rows.forEach((r,i)=>{const mk=L.marker(r.pt,{icon:L.divIcon({className:"",html:`<span class="pin${i<3&&!isDesktop()?" top":""}${hlId===r.id?" hl":""}" data-detail="${r.id}">${i+1}</span>`,iconSize:null}),zIndexOffset:hlId===r.id?900:(i<3?500:0),keyboard:false});mk.on("click",()=>{setHl(r.id,true);});mk.on("mouseover",()=>{if(isDesktop())setHl(r.id,true);});mk.addTo(pinLayer);});
+    rows.forEach((r,i)=>{const mk=L.marker(r.pt,{icon:L.divIcon({className:"",html:`<span class="pin${i<3&&!isDesktop()?" top":""}${hlId===r.id?" hl":""}" data-detail="${r.id}">${i+1}</span>`,iconSize:null}),zIndexOffset:hlId===r.id?900:(i<3?500:0),keyboard:false});mk.on("click",()=>{setHl(r.id,true);});mk.on("mouseover",()=>{if(isDesktop()&&hlId!==r.id)setHl(r.id,true);});mk.addTo(pinLayer);});
   }
   const stops=plan.map(id=>byId.get(id)).filter(Boolean);
   if(stops.length>1)L.polyline(stops.map(r=>r.pt),{renderer:cv,interactive:false,color:cssVar("--rose"),weight:2.5,opacity:.9,dashArray:"6 6"}).addTo(planLayer);
