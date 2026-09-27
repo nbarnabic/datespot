@@ -129,6 +129,14 @@ body.scrolled .modeseg{display:none}
 .pillrow{padding:14px 20px 0;display:flex;gap:8px;flex-wrap:wrap}
 .pillsel{position:relative;display:inline-flex}
 .pillsel select{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 30px 8px 14px;font:inherit;font-size:14px;cursor:pointer;width:auto}
+.stops{padding:14px 20px 0;display:flex;flex-direction:column;gap:8px}
+.stoprow{display:flex;gap:8px;align-items:center}
+.stoprow .num{flex:none;width:28px;height:28px;border-radius:999px;background:var(--rose);color:var(--bg);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+.stoprow .pillsel{flex:1}
+.stoprow .pillsel select{width:100%}
+.stoprow .x{flex:none;width:36px;height:36px;border-radius:999px;border:1px solid var(--strong);background:transparent;color:var(--muted);font-size:18px;cursor:pointer}
+.addstop{align-self:flex-start;border:1px dashed var(--strong);background:transparent;color:var(--ink);border-radius:999px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer}
+.stops .hint{margin:0}
 .pillsel::after{content:"▾";position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:13px}
 .rcard .acts2{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
 .pickcard .acts2{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
@@ -494,7 +502,8 @@ body.locked .tabs,body.locked .view{visibility:hidden}
   </div>
   <div class="pillrow" style="padding-top:12px"><div class="seg" style="margin:0;flex:1" role="group" aria-label="Night or day"><button type="button" data-mode="night" aria-pressed="true">Night</button><button type="button" data-mode="day" aria-pressed="false">Day</button></div></div>
   <div class="planhead"><div class="prompt" id="prompt">What kind of<br><em>night</em> is it?</div><div class="planbtn deskonly"></div></div>
-  <div class="pillrow"><span class="pillsel"><select id="seqSel" aria-label="How many stops"><option value="one">Just one stop</option><option value="dd">Drinks → Dinner</option><option value="dr">Dinner → Drinks</option><option value="ddl">Drinks → Dinner → Late night</option><option value="cwl">Coffee → Walk → Lunch</option><option value="mc">Museum → Coffee</option><option value="ds">Dinner → Show</option><option value="sd">Show → Drinks</option></select></span><span class="pillsel"><select id="planDay" aria-label="When"></select></span></div>
+  <div class="pillrow"><span class="pillsel"><select id="planDay" aria-label="When"></select></span></div>
+  <div class="stops" id="stops"></div>
   <div class="pillrow" style="padding-top:8px"><button class="pill muted" type="button" data-origin="start">◎ <span class="fromword">from </span><span class="originlbl"></span></button><button class="pill muted" type="button" data-origin="end">⌂ <span class="endlbl"></span></button></div>
   <div class="tiles" id="tiles"></div>
   <div style="padding:14px 20px 0"><button class="primary" id="pickBtn2" type="button">Pick one for me</button></div>
@@ -670,7 +679,7 @@ let homeMode=store.get("datebars-mode","night");if(homeMode!=="day")homeMode="ni
 let planMode=store.get("datebars-planmode","night");if(planMode!=="day")planMode="night";
 const occHome={night:"all",day:"all"},occPlan={night:"all",day:"all"};
 let mode=homeMode,occasion="all",pickedPlan=null,lastPickedPlan=null;
-let seqKey=store.get("datebars-seq","one");
+let slots=store.get("datebars-slots",[]).filter(k=>SLOTS[k]);
 let endPt=store.get("datebars-end",null),endLabel=store.get("datebars-end-label","")||"";const hasEnd=()=>Array.isArray(endPt)&&endPt.length===2;
 let profile=store.get("datebars-profile",null);const prof=k=>profile?profile[k]:undefined;
 let personalized=store.get("datebars-personalized",true);
@@ -691,9 +700,30 @@ const OCCDEF={first:{feats:["quiet"],four:true,price:[1,2]},special:{four:true,p
   museum:{cats:["Museum","Gallery"]},walkcoffee:{cats:["Walk","Park","Garden","Cafe","View"]},rainy:{featsAny:["rainy day"],catsOr:[...INDOOR]},picnic:{cats:["Park","Garden","Market"]},market:{cats:["Market"]},sunset:{featsAny:["view"],catsOr:["View","Boat"]},show:{cats:["Cinema","Music","Comedy","Theater"]},active:{featsAny:["active"],catsOr:["Activity","Boat","Walk"]}};
 const OCCOF=m=>m==="day"?OCCD:OCCN;const OCC=()=>OCCOF(homeMode);
 const occLabel=(k,m)=>(OCCOF(m||homeMode).find(o=>o[0]===k)||OCCOF(m||homeMode)[0])[1];
-const SLOTS={drinks:{kind:"bar",types:["Drinks only","Snacks & small plates"],label:"Drinks"},dinner:{kind:"bar",types:["Full meal","Bar food"],label:"Dinner"},late:{kind:"bar",types:["Drinks only","Snacks & small plates","Bar food"],featsAny:["late night","dancing"],label:"Late night"},coffee:{kind:"place",cats:["Cafe"],label:"Coffee"},walk:{kind:"place",cats:["Walk","Park","Garden","View"],label:"Walk"},lunch:{kind:"bar",types:["Full meal","Bar food"],label:"Lunch"},museum:{kind:"place",cats:["Museum","Gallery","Bookstore"],label:"Museum"},show:{kind:"place",cats:["Cinema","Music","Comedy","Theater"],label:"Show"}};
-const SEQS=[["one","Just one stop",[]],["dd","Drinks → Dinner",["drinks","dinner"]],["dr","Dinner → Drinks",["dinner","drinks"]],["ddl","Drinks → Dinner → Late night",["drinks","dinner","late"]],["cwl","Coffee → Walk → Lunch",["coffee","walk","lunch"]],["mc","Museum → Coffee",["museum","coffee"]],["ds","Dinner → Show",["dinner","show"]],["sd","Show → Drinks",["show","drinks"]]];
-const seqSlots=()=>(SEQS.find(x=>x[0]===seqKey)||SEQS[0])[2];
+const SLOTS={
+  drinks:{label:"Drinks",match:r=>r.kind==="bar"&&["Drinks only","Snacks & small plates"].includes(r.type)},
+  dinner:{label:"Dinner",match:r=>r.kind==="bar"&&["Full meal","Bar food"].includes(r.type)},
+  lunch:{label:"Lunch",match:r=>r.kind==="bar"&&["Full meal","Bar food"].includes(r.type)},
+  snacks:{label:"Snacks & small plates",match:r=>r.kind==="bar"&&r.type==="Snacks & small plates"},
+  late:{label:"Late night",match:r=>r.kind==="bar"&&r.type!=="Full meal"&&(r.feats.includes("late night")||r.feats.includes("dancing"))},
+  dancing:{label:"Dancing",match:r=>r.kind==="bar"&&r.feats.includes("dancing")},
+  coffee:{label:"Coffee",match:r=>r.cat==="Cafe"},
+  dessert:{label:"Dessert",match:r=>r.cat==="Cafe"||r.cuis.includes("Dessert")},
+  walk:{label:"Walk",match:r=>["Walk","Park","Garden","View"].includes(r.cat)},
+  park:{label:"Park or garden",match:r=>["Park","Garden"].includes(r.cat)},
+  view:{label:"A view",match:r=>r.cat==="View"||r.feats.includes("view")},
+  museum:{label:"Museum or gallery",match:r=>["Museum","Gallery"].includes(r.cat)},
+  bookstore:{label:"Bookstore",match:r=>r.cat==="Bookstore"},
+  market:{label:"Market",match:r=>r.cat==="Market"},
+  show:{label:"Show",match:r=>["Cinema","Music","Comedy","Theater"].includes(r.cat)},
+  movie:{label:"Movie",match:r=>r.cat==="Cinema"},
+  music:{label:"Live music",match:r=>r.cat==="Music"||r.feats.includes("live music")},
+  comedy:{label:"Comedy",match:r=>r.cat==="Comedy"},
+  activity:{label:"Activity",match:r=>["Activity","Boat"].includes(r.cat)},
+  boat:{label:"On the water",match:r=>r.cat==="Boat"},
+  dispensary:{label:"Dispensary",match:r=>r.cat==="Dispensary"}};
+const SLOTKEYS=Object.keys(SLOTS);
+const seqSlots=()=>slots;
 
 // ---------- controls ----------
 const sortEl=$("sort"),qEl=$("q"),hoodEl=$("hood"),ftypeEl=$("ftype"),resvEl=$("resv"),dayEl=$("day"),fourEl=$("fourPlus"),newEl=$("newOnly"),unvEl=$("hideUnv"),openNowEl=$("openNow"),openLateEl=$("openLate");
@@ -884,7 +914,7 @@ $("pickBtn2").onclick=()=>{seqSlots().length?autoPlan():pickOnePlan();};
 document.addEventListener("click",e=>{if(e.target.closest("[data-clearpick]")){picked=null;update();}});
 
 // ---------- plan tab ----------
-function slotRows(slotKey,near,arriveMin){const S=SLOTS[slotKey];let rows=ALL.filter(r=>r.kind===S.kind&&r.status!=="closed"&&r.status!=="unverified"&&(r.cat!=="Dispensary")&&!closedOnDay(r,planDay)&&(!S.types||S.types.includes(r.type))&&(!S.cats||S.cats.includes(r.cat))&&(!S.featsAny||S.featsAny.some(f=>r.feats.includes(f))));
+function slotRows(slotKey,near,arriveMin){const S=SLOTS[slotKey];if(!S)return [];let rows=ALL.filter(r=>S.match(r)&&r.status!=="closed"&&r.status!=="unverified"&&(r.cat!=="Dispensary"||prof("cannabis")==="yes")&&!closedOnDay(r,planDay));
   if(arriveMin!=null)rows=rows.filter(r=>{const h=hoursOn(r,planDay);if(!h)return true;return arriveMin>=h.o&&(h.c===null||arriveMin<h.c-30);});
   const walkCap=prof("walk")==="walk10"?10:15;
   return rows.map(r=>({r,m:near?walkMin(near,r.pt):null})).filter(o=>o.m===null||o.m<=walkCap).sort((a,b)=>(a.m??0)-(b.m??0)||b.r.score-a.r.score).map(o=>o.r);}
@@ -897,14 +927,14 @@ function autoPlan(){const slots=seqSlots();if(!slots.length){pickOnePlan();retur
 function renderPlanTab(){
   paintMode();const base=planBase();
   OCCOF(planMode).forEach(([k])=>{const el=document.querySelector(`[data-n="${k}"]`);if(el){const n=occRows(base,k).length;el.textContent=n+(n===1?(planMode==="day"?" place":" bar"):(planMode==="day"?" places":" bars"));}});
-  $("seqSel").value=seqKey;const slots=seqSlots();const stops=plan.map(id=>byId.get(id)).filter(Boolean);
+  renderStops();const stops=plan.map(id=>byId.get(id)).filter(Boolean);
   const pc=$("pickcard");const pr=pickedPlan&&byId.get(pickedPlan);
   if(slots.length&&stops.length){ // itinerary summary on Plan
     const it=itinerary();pc.hidden=false;pc.innerHTML=`<div class="pickcard"><div class="eb">${stops.length>=slots.length?"Your date is set":"Stop "+(stops.length+1)+" next: "+SLOTS[slots[stops.length]].label}</div>${it.map((x,i)=>`<div class="sm" style="margin-top:6px"><b style="color:var(--ink)">${i+1}. ${x.r.name}</b> · ${clock(x.arrive)} · ${x.r.type}${x.warn?` · <span style="color:var(--rose)">${esc(x.warn)}</span>`:""}</div>`).join("")}<div class="acts2"><button class="act primary" type="button" id="goDate">Open the Date tab</button><button class="act" type="button" id="replan">Plan it again</button><button class="act" type="button" id="clearplan">Start over</button></div></div>`;
     pc.querySelector("#goDate").onclick=()=>showView("tonight");pc.querySelector("#replan").onclick=()=>autoPlan();pc.querySelector("#clearplan").onclick=()=>{plan=[];savePlan();update();};
   }else if(pr){pc.hidden=false;pc.innerHTML=`<div class="pickcard" data-id="${pr.id}"><div class="eb">Go here</div><div class="nm">${pr.name}</div><div class="sm">${dot(pr.hood,distTxt(pr),pr.kind==="bar"?book(pr):pr.type)}</div><div class="ds">${pr.why}</div><div class="acts2"><button class="act primary" type="button" data-plan="${pr.id}" aria-pressed="${plan.includes(pr.id)}">${plan.includes(pr.id)?"In the date ✓":"Make it stop "+(plan.length+1)}</button>${dirLink(pr,"act","Directions ↗︎")}<button class="act" type="button" id="pickAgain">Another</button></div></div>`;pc.querySelector("#pickAgain").onclick=()=>pickOnePlan();}
   else{pc.hidden=true;pc.innerHTML="";}
-  $("pickBtn2").textContent=slots.length?"Plan it for me":"Pick one for me";
+  $("pickBtn2").textContent=slots.length?"Plan it for me ("+slots.length+" stop"+(slots.length>1?"s":"")+")":"Pick one for me";
   // results: next slot when building a sequence by hand, otherwise the occasion
   let rows,title;
   if(slots.length&&stops.length<slots.length){const k=stops.length;const last=stops[stops.length-1];const it=itinerary();const arrive=it.length?it[it.length-1].arrive+it[it.length-1].dwell:startAt;rows=slotRows(slots[k],last?last.pt:(hasOrigin()?origin:null),arrive).filter(r=>!plan.includes(r.id));title="Stop "+(k+1)+": "+SLOTS[slots[k]].label+(last?" near "+last.name:"");}
@@ -913,7 +943,13 @@ function renderPlanTab(){
   const k=stops.length;
   $("rail").innerHTML=rows.slice(0,8).map(r=>`<div class="rcard" data-id="${r.id}"><div class="top"><span class="h">${hearts(r.score)}</span>${heartBtn(r,"")}</div><div class="nm">${r.name}</div><div class="sm">${dot(r.hood,"$".repeat(r.cost),r.type,distTxt(r))}</div><div class="ds">${r.why}</div><div class="acts2"><button class="act${plan.includes(r.id)?" primary":""}" type="button" data-plan="${r.id}" aria-pressed="${plan.includes(r.id)}">${plan.includes(r.id)?"In the date ✓":(slots.length?"Add as stop "+(k+1):"Add to date")}</button>${dirLink(r,"act","Directions ↗︎")}</div></div>`).join("")||'<div class="empty">Nothing fits this slot nearby. Loosen a filter or plan it again.</div>';
 }
-$("seqSel").onchange=()=>{seqKey=$("seqSel").value;store.set("datebars-seq",seqKey);update();};
+function saveSlots(){store.set("datebars-slots",slots);}
+function renderStops(){const el=$("stops");const stops=plan.map(id=>byId.get(id)).filter(Boolean);
+  el.innerHTML=slots.map((k,i)=>`<div class="stoprow"><span class="num">${i+1}</span><span class="pillsel"><select data-slotsel="${i}" aria-label="Stop ${i+1} type">${SLOTKEYS.filter(x=>x!=="dispensary"||prof("cannabis")==="yes").map(x=>`<option value="${x}" ${x===k?"selected":""}>${SLOTS[x].label}</option>`).join("")}</select></span>${stops[i]?`<span class="sm" style="font-size:13px;color:var(--muted);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${stops[i].name}</span>`:""}<button class="x" type="button" data-slotdel="${i}" aria-label="Remove stop ${i+1}">×</button></div>`).join("")
+    +`<button class="addstop" type="button" id="addStop">+ Add a stop${slots.length?"":" to build a night"}</button>`+(slots.length?"":'<p class="hint">No stops set: Pick one for me chooses a single place. Add stops to plan a whole night, as many as you like.</p>');
+  el.querySelectorAll("[data-slotsel]").forEach(sel=>sel.onchange=()=>{const i=+sel.dataset.slotsel;slots[i]=sel.value;saveSlots();if(plan.length>i){plan=plan.slice(0,i);savePlan();}update();});
+  el.querySelectorAll("[data-slotdel]").forEach(b=>b.onclick=()=>{const i=+b.dataset.slotdel;slots.splice(i,1);saveSlots();if(plan.length>i){plan.splice(i,1);savePlan();}update();});
+  el.querySelector("#addStop").onclick=()=>{const last=slots[slots.length-1];const next=!last?(planMode==="day"?"coffee":"drinks"):last==="drinks"?"dinner":last==="dinner"?"drinks":last==="coffee"?"walk":last==="walk"?"lunch":last==="show"?"drinks":"drinks";slots.push(next);saveSlots();update();};}
 $("seeAll").onclick=()=>showView("home");
 
 // ---------- shortlist tab ----------
