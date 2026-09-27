@@ -224,6 +224,12 @@ body.scrolled .modeseg{display:none}
 .setrow.danger .edit{color:var(--rose);border-color:var(--rose)}
 .settings .grp{padding:18px 0 6px;font:600 11px system-ui,-apple-system,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .tuned{padding:14px 22px 0;font-size:14px;color:var(--muted)}
+.guide{display:flex;flex-direction:column;gap:12px;margin:6px 0 4px}
+.grow{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--muted)}
+.grow b{color:var(--ink);font-size:16px;display:block;margin-bottom:2px}
+.gico{flex:none;width:36px;height:36px;border-radius:12px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--rose)}
+.gico svg{width:20px;height:20px}
+.tips{margin:6px 0 4px;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:15px;color:var(--ink)}
 .tuned button{border:0;background:none;color:var(--rose);font:inherit;font-size:14px;cursor:pointer;padding:0}
 .anniv{margin:14px 20px 0;padding:12px 14px;border-radius:14px;border:1px solid var(--rose);font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .anniv button{border:0;background:var(--rose);color:var(--bg);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
@@ -861,7 +867,7 @@ function closedTxt(r){if(!r.closed)return "";const days=r.closed.split(",").map(
 
 // ---------- filtering ----------
 function baseRows(){ // manual filters (sheet + search), no occasion, no sort
-  let rows=ALL.filter(r=>(homeMode==="day"?r.kind==="place":r.kind==="bar")&&(r.cat!=="Dispensary"||prof("cannabis")==="yes"));const now=new Date();
+  let rows=ALL.filter(r=>(homeMode==="day"?r.kind==="place":r.kind==="bar")&&(r.cat!=="Dispensary"||prof("cannabis")==="yes"||catOn.has("Dispensary")));const now=new Date();
   const q=qEl.value.trim().toLowerCase();
   if(q)rows=rows.filter(r=>(r.name+" "+r.hood+" "+r.where+" "+r.why+" "+r.food+" "+r.feats.join(" ")+" "+r.cuis.join(" ")).toLowerCase().includes(q));
   if(hood!=="All")rows=rows.filter(r=>r.hood===hood);
@@ -1150,7 +1156,11 @@ function paintMapList(){
 darkMq.addEventListener("change",()=>{if(map){location.reload();}});
 
 // ---------- onboarding (answers stay on this phone) ----------
+const GUIDE=[["short","Shortlist","Places you've saved with the heart, your private notes, and Settings."],["plan","Plan","Pick an occasion, add stops, and let it plan the night, or build it yourself."],["home","Home","Everything, rated out of five hearts. Search, filter, or tap Pick one."],["tonight","Date","Your stops in order with arrival times. Share a teaser or the full plan."],["map","Map","Every place on the map, ranked by how far it is from your starting point."]];
+const TIPS=["Set a starting point and every distance, walk time, and map rank follows it.","Hearts are for date potential, not food quality. Five means go.","Notes and your shortlist live on this phone only. Nothing is shared unless you share it.","Tap any card for the full details: site, reservations, hours, directions."];
 const OB=[
+ {k:"guide",q:"How Date Spot works",sub:"Five tabs, bottom of the screen.",guide:true},
+ {k:"tips",q:"A few things worth knowing",sub:"",tips:true},
  {k:"status",q:"Where are you at?",sub:"The app leans toward what's useful for you: first-date spots, or date nights for two.",one:true,opts:[["single","Single, going on dates"],["new","Seeing someone new"],["couple","In a relationship"],["married","Married"]]},
  {k:"follow",q:"",sub:"",follow:true},
  {k:"drink",q:"Drinking?",sub:"Changes how bars are ranked for you. Nothing is hidden.",one:true,opts:[["drink","I drink"],["none","I don't drink"],["curious","Sober-curious"]]},
@@ -1163,16 +1173,18 @@ const OB=[
  {k:"name",q:"Your name",sub:"Full name, only used when you suggest a spot so we know who to thank.",text:true}];
 const STATUS_L={single:"Single, going on dates",new:"Seeing someone new",couple:"In a relationship",married:"Married"};
 const isCouple=()=>["couple","married"].includes(prof("status"));
-let obStep=0,obDraft={},obSingle=false;
+let obStep=0,obDraft={},obSingle=false,obGuideOnly=false;
 function openOnboard(step,single){obStep=step||0;obSingle=!!single;obDraft=Object.assign({},profile||{});renderOnboard();openSheet("onboard");}
 function followStep(){const c=["couple","married"].includes(obDraft.status);return c?{k:"anniv",q:"Got an anniversary?",sub:"Optional. We'll nudge you a few weeks out with Special night ideas.",date:true}:{k:"dating",q:"What are these dates, mostly?",sub:"Sets which occasions come first for you.",one:true,opts:[["first","First dates"],["early","Second and third dates"],["mix","A mix"]]};}
 function renderOnboard(){let st=OB[obStep];if(st.follow)st=followStep();const box=$("obBody");const v=obDraft[st.k];
   let body="";
   if(st.date)body=`<div class="row"><input id="obDate" type="date" style="width:auto" value="${esc(obDraft.anniv||"")}"></div>`;
+  if(st.guide)body=`<div class="guide">${GUIDE.map(([id,n,t])=>`<div class="grow"><span class="gico">${$("tab-"+id).querySelector("svg").outerHTML}</span><div><b>${n}</b><div>${t}</div></div></div>`).join("")}</div>`;
+  if(st.tips)body=`<ul class="tips">${TIPS.map(t=>`<li>${t}</li>`).join("")}</ul>`;
   if(st.opts)body=`<div class="dacts">${st.opts.map(([val,l])=>`<button class="act" type="button" data-ob="${val}" aria-pressed="${st.one?v===val:(v||[]).includes(val)}">${l}</button>`).join("")}</div>`;
   if(st.origin)body=`<div class="row"><input id="obAddr" type="search" placeholder="Address, cross streets, or a place" autocomplete="off"></div><div class="dacts"><button class="act" type="button" id="obGeo">Use my location</button><button class="act" type="button" id="obGo">Set</button></div><p class="hint" id="obMsg">${hasOrigin()?"Currently "+esc(originLabel):""}</p>`;
   if(st.text)body=`<div class="row"><input id="obName" type="text" placeholder="Full name" autocomplete="name" value="${esc(obDraft.name||store.get("datebars-from","")||"")}"></div>`;
-  const last=obSingle||obStep>=OB.length-1;
+  const last=obSingle||obStep>=OB.length-1||(obGuideOnly&&obStep>=1);
   box.innerHTML=`<div class="eyebrow" style="color:var(--rose)">${obSingle?"Settings":(obStep+1)+" of "+OB.length}</div><h2 style="margin-top:4px">${st.q}</h2><p>${st.sub}</p>${body}<div class="row" style="justify-content:space-between;margin-top:6px"><button class="chip" type="button" id="obSkip">${obSingle?"Cancel":"Skip"}</button><span><button class="chip" type="button" id="obBack" ${obStep&&!obSingle?"":"hidden"}>Back</button> <button class="chip" type="button" id="obNext" style="background:var(--chip-on);color:var(--chip-on-ink)">${last?"Done":"Next"}</button></span></div><p class="hint" style="margin-top:10px">Your answers stay on this phone. Nothing is sent anywhere.</p>`;
   box.querySelectorAll("[data-ob]").forEach(b=>b.onclick=()=>{const val=b.dataset.ob;if(st.one)obDraft[st.k]=val;else{const arr=new Set(obDraft[st.k]||[]);arr.has(val)?arr.delete(val):arr.add(val);obDraft[st.k]=[...arr];}renderOnboard();});
   const geo=box.querySelector("#obGeo");if(geo)geo.onclick=()=>{geo.textContent="Locating…";locate(p=>{originWhich="start";setOrigin([p.coords.latitude,p.coords.longitude],"my location");openSheet("onboard");renderOnboard();},()=>{geo.textContent="Use my location";$("obMsg").textContent="Location blocked. Type an address instead.";});};
@@ -1181,6 +1193,7 @@ function renderOnboard(){let st=OB[obStep];if(st.follow)st=followStep();const bo
 function obFinish(){profile=obDraft;profile.done=true;store.set("datebars-profile",profile);if(profile.name)store.set("datebars-from",profile.name);closeSheet("onboard");buildOcc();update();}
 function obAdvance(save){let st=OB[obStep];if(st.follow)st=followStep();if(st.text){const n=$("obName");if(n&&save)obDraft.name=n.value.trim();}if(st.date){const d=$("obDate");if(d&&save)obDraft.anniv=d.value;}if(!save&&!obSingle)delete obDraft[st.k];
   if(obSingle){if(save)obFinish();else closeSheet("onboard");return;}
+  if(obGuideOnly&&obStep>=1){obGuideOnly=false;closeSheet("onboard");return;}
   if(obStep<OB.length-1){obStep++;renderOnboard();return;}obFinish();}
 $("pchip").onclick=()=>{personalized=!personalized;store.set("datebars-personalized",personalized);update();};
 document.addEventListener("click",e=>{const b=e.target.closest("[data-settings]");if(b){showView("short");setTimeout(()=>$("settings").scrollIntoView({behavior:"smooth",block:"start"}),50);}});
@@ -1202,10 +1215,13 @@ function renderSettings(){const el=$("settings");const P=profile||{};const lbl=(
     <div class="grp">Places</div>
     <div class="setrow"><div><div class="k">Usual starting point</div><div class="v">${hasOrigin()?esc(originLabel):"Not set"}</div></div><button class="edit" type="button" data-origin="start">Edit</button></div>
     <div class="setrow"><div><div class="k">Directions open in</div><div class="v">${dirApp==="google"?"Google Maps":"Apple Maps"}</div></div><button class="edit" type="button" id="setDir">Switch</button></div>
+    <div class="grp">Help</div>
+    <div class="setrow"><div><div class="k">How Date Spot works</div><div class="v">The five tabs, and a few tips</div></div><button class="edit" type="button" id="showGuide">Open</button></div>
     <div class="grp">Reset</div>
     <div class="setrow"><div><div class="k">Run setup again</div><div class="v">Walk through every question</div></div><button class="edit" type="button" data-editstep="0" data-all="1">Start</button></div>
     <div class="setrow danger"><div><div class="k">Clear this phone</div><div class="v">Shortlist, notes, date plan, and answers</div></div><button class="edit" type="button" id="wipe">Clear</button></div>`;
   el.querySelectorAll("[data-editstep]").forEach(b=>b.onclick=()=>openOnboard(+b.dataset.editstep,!b.dataset.all));
+  el.querySelector("#showGuide").onclick=()=>{obGuideOnly=true;openOnboard(0,false);};
   el.querySelector("#setDir").onclick=()=>{dirApp=dirApp==="google"?"apple":"google";store.set("datebars-dir",dirApp);paintDir();update();};
   el.querySelector("#wipe").onclick=()=>{if(!confirm("Clear the shortlist, notes, date plan, starting point, and your answers on this phone?"))return;["datebars-picks","datebars-notes","datebars-plan","datebars-profile","datebars-origin","datebars-origin-label","datebars-end","datebars-end-label","datebars-slots","datebars-from","datebars-personalized"].forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});location.reload();};}
 // ---------- suggest a spot ----------
