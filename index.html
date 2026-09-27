@@ -306,8 +306,11 @@ body.locked .tabs,body.locked .view{visibility:hidden}
   .tabs button span b{font-weight:400;font-size:13px;color:var(--muted)}
   .tabs .sidespacer{display:block;flex:1}
   .tabs .sidewm,.tabs .sidespacer{display:block}
-  .tabs button.sideorigin{display:block;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit;font-size:13px;color:var(--muted);line-height:1.4;text-align:left;background:transparent;cursor:pointer}
-  .tabs .sideorigin .originlbl{color:var(--ink);border-bottom:1px dashed var(--subtle)}
+  .tabs button.sideorigin{display:block;width:100%;min-width:0;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit;font-size:13px;color:var(--muted);line-height:1.4;text-align:left;background:transparent;cursor:pointer;overflow:hidden}
+  .tabs .sideorigin .originlbl{display:block;max-width:100%;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:0;background-image:linear-gradient(to right,var(--subtle) 50%,transparent 50%);background-size:6px 1px;background-repeat:repeat-x;background-position:0 100%;padding-bottom:1px}
+  /* wide monitors: keep content readable */
+  #view-plan,#view-tonight,#view-short{max-width:1240px}
+  #view-plan .pillrow .seg{max-width:420px}
   .view{padding-bottom:40px;min-height:100vh}
   /* home: list + live map */
   .homegrid{display:grid;grid-template-columns:minmax(0,600px) minmax(0,1fr);min-height:100vh}
@@ -774,7 +777,7 @@ $("endSame").onclick=()=>{if(hasOrigin()){endPt=origin.slice();endLabel=originLa
 function clearOrigin(){origin=null;originLabel="";store.set("datebars-origin",null);store.set("datebars-origin-label","");closeSheet("originSheet");update();}
 $("originDefault").onclick=()=>{addrEl.value="";originWhich==="end"?clearEnd():clearOrigin();};
 function gridGeocode(q){const t=q.toLowerCase().replace(/\./g,"");const stM=t.match(/(?:^|\D)(\d{1,3})(?:st|nd|rd|th)?\s*(?:st|street)\b/);const aveWords={"lexington":3.5,"lex":3.5,"park":4,"madison":4.5,"broadway":5.5,"ave a":0,"avenue a":0,"ave b":-1,"avenue b":-1,"ave c":-2,"avenue c":-2,"ave d":-3,"avenue d":-3};let ave=null;const aveM=t.match(/(\d{1,2})(?:st|nd|rd|th)?\s*(?:ave|avenue)\b/);if(aveM)ave=+aveM[1];if(ave===null)for(const k in aveWords)if(t.includes(k)){ave=aveWords[k];break;}if(!stM||ave===null)return null;const st=+stM[1];if(st<1||st>125)return null;const lat=40.7318+(st-14)*0.000579+(ave-1)*0.0011,lng=-73.9821+(st-14)*0.000468+(ave-1)*(-0.00296);return {pt:[lat,lng],label:q.trim()+" (approx.)"};}
-async function geocode(q){q=q.trim();if(!q)return;const m=q.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/);if(m){setOrigin([+m[1],+m[2]],"your point");return;}const g=gridGeocode(q);if(g){setOrigin(g.pt,g.label);return;}msgEl.textContent="Finding "+q+"…";const url="https://nominatim.openstreetmap.org/search?format=json&limit=1&viewbox=-74.06,40.88,-73.90,40.68&bounded=1&q="+encodeURIComponent(q+", New York");try{const r=await fetch(url,{headers:{"Accept":"application/json"}});const j=await r.json();if(!j.length){msgEl.textContent="Couldn't find that nearby. Try adding a cross street or zip.";return;}setOrigin([+j[0].lat,+j[0].lon],j[0].display_name.split(",").slice(0,2).join(","));}catch(e){msgEl.textContent="Address lookup needs a connection. Try cross streets like \"7th St and 2nd Ave\", or use my location.";}}
+async function geocode(q){q=q.trim();if(!q)return;const m=q.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/);if(m){setOrigin([+m[1],+m[2]],"your point");return;}const g=gridGeocode(q);if(g){setOrigin(g.pt,g.label);return;}msgEl.textContent="Finding "+q+"…";const url="https://nominatim.openstreetmap.org/search?format=json&limit=1&viewbox=-74.06,40.88,-73.90,40.68&bounded=1&q="+encodeURIComponent(q+", New York");try{const r=await fetch(url,{headers:{"Accept":"application/json"}});const j=await r.json();if(!j.length){msgEl.textContent="Couldn't find that nearby. Try adding a cross street or zip.";return;}setOrigin([+j[0].lat,+j[0].lon],j[0].display_name.split(",")[0].trim());}catch(e){msgEl.textContent="Address lookup needs a connection. Try cross streets like \"7th St and 2nd Ave\", or use my location.";}}
 $("go").onclick=()=>{hideSugg();geocode(addrEl.value);};
 const suggEl=$("sugg");let suggTimer=null,suggAbort=null;
 function hideSugg(){suggEl.hidden=true;suggEl.innerHTML="";}
