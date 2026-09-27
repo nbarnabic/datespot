@@ -67,10 +67,15 @@ body.scrolled .searchrow{padding-top:10px}
 .search svg{flex:none}
 .iconbtn{width:46px;height:46px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink);cursor:pointer;position:relative;flex:none}
 .iconbtn .badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:999px;background:var(--rose);color:var(--bg);font:700 11px system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:0 5px}
-.occrow{display:flex;gap:8px;overflow-x:auto;padding:12px 20px 0}
+.occrow{display:flex;gap:8px;flex-wrap:wrap;padding:12px 20px 0}
+body.scrolled .occrow{display:none}
 .occ{flex:none;border-radius:999px;padding:8px 14px;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;white-space:nowrap}
 .occ[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.metarow{padding:14px 20px 8px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted)}
+.metarow{padding:14px 20px 8px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted);flex-wrap:wrap}
+.metarow > span:first-child{flex:1 1 auto}
+.tier.c{cursor:pointer;width:100%;border:0;background:none;text-align:left;font-family:inherit}
+.tier .chev{margin-left:auto;color:var(--muted);font-size:18px;line-height:1;transition:transform .15s;display:inline-block}
+.tier[aria-expanded="true"] .chev{transform:rotate(90deg)}
 .metarow .origin{color:var(--ink);border:0;background:none;padding:0;font:inherit;font-size:14px;border-bottom:1px dashed var(--subtle);cursor:pointer}
 .sortsel{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--ink);font:inherit;font-size:14px;padding:0 16px 0 0;cursor:pointer;text-align:right;direction:rtl;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23a39a90' stroke-width='1.6'/></svg>");background-repeat:no-repeat;background-position:right center}
@@ -126,8 +131,8 @@ body.scrolled .searchrow{padding-top:10px}
 .railhdr{padding:22px 22px 10px;display:flex;justify-content:space-between;align-items:baseline}
 .railhdr b{font-size:18px;font-weight:600}
 .railhdr button{border:0;background:none;color:var(--rose);font:inherit;font-size:14px;cursor:pointer;padding:0}
-.rail{display:flex;gap:10px;overflow-x:auto;padding:0 20px 24px;scroll-snap-type:x mandatory}
-.rcard{flex:none;width:250px;scroll-snap-align:start;background:var(--card);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.rail{display:flex;flex-direction:column;gap:10px;padding:0 16px 24px}
+.rcard{background:var(--card);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
 .rcard .top{display:flex;justify-content:space-between;align-items:center}
 .rcard .h{color:var(--rose);font-size:13px;letter-spacing:1px}
 .rcard .heart{width:32px;height:32px;border:0;background:transparent}
@@ -304,9 +309,10 @@ body.locked .tabs,body.locked .view{visibility:hidden}
       <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg><input id="q" type="search" placeholder="Bars, food, vibe" aria-label="Search" autocomplete="off"></label>
       <button class="iconbtn" id="filtersBtn" type="button" aria-label="Filters"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg><span class="badge" id="filterBadge" hidden></span></button>
     </div>
-    <div class="occrow noscroll" id="occrow"></div>
+    <div class="occrow" id="occrow"></div>
     <div class="metarow">
       <span><span id="count"></span> bars from <button class="origin" type="button" data-origin="1" id="originHome">Christopher St PATH</button></span>
+      <span><button class="linkbtn" id="expall" type="button" hidden>Expand all</button></span>
       <select class="sortsel" id="sort" aria-label="Sort">
         <option value="score">Best for a date</option>
         <option value="dist">Closest first</option>
@@ -329,8 +335,8 @@ body.locked .tabs,body.locked .view{visibility:hidden}
   <div class="tiles" id="tiles"></div>
   <div style="padding:14px 20px 0"><button class="primary" id="pickBtn2" type="button">Pick one for me</button></div>
   <div id="pickcard" hidden></div>
-  <div class="railhdr"><b id="railTitle">Best overall</b><button type="button" id="seeAll">See all</button></div>
-  <div class="rail noscroll" id="rail"></div>
+  <div class="railhdr"><b id="railTitle">All</b><button type="button" id="seeAll">See all</button></div>
+  <div class="rail" id="rail"></div>
 </div>
 
 <!-- ============ SHORTLIST ============ -->
@@ -354,7 +360,7 @@ body.locked .tabs,body.locked .view{visibility:hidden}
 <div id="view-map" class="view safe" hidden>
   <div class="mappanel">
     <div id="map" aria-label="Map of bars"></div>
-    <div class="mapchips"><button type="button" id="mapOcc">Best overall</button><button type="button" id="mapCap" aria-pressed="false">≤ 20 min</button></div>
+    <div class="mapchips"><button type="button" id="mapOcc">All</button><button type="button" id="mapCap" aria-pressed="false">≤ 20 min</button></div>
     <button class="locbtn" id="locate" type="button" aria-label="Use my location"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path><circle cx="12" cy="12" r="5"></circle></svg></button>
   </div>
   <div class="maplisthdr"><b>Closest to you</b><span>from <span class="originlbl">Christopher St PATH</span></span></div>
@@ -461,7 +467,7 @@ let notes=store.get("datebars-notes",{})||{};
 let plan=store.get("datebars-plan",[]).filter(x=>byId.has(x));
 const savePicks=()=>store.set("datebars-picks",[...picks]),saveNotes=()=>store.set("datebars-notes",notes),savePlan=()=>store.set("datebars-plan",plan);
 let origin=[40.7330,-74.0071],originLabel="Christopher St PATH";
-const OCC=[["all","Best overall"],["first","First date"],["special","Special night"],["dinner","Dinner too"],["late","Late night"],["dancing","Dancing"],["outside","Outside"],["cheap","Cheap & good"]];
+const OCC=[["all","All"],["first","First date"],["special","Special night"],["dinner","Dinner too"],["late","Late night"],["dancing","Dancing"],["outside","Outside"],["cheap","Cheap & good"]];
 const OCCDEF={first:{feats:["quiet"],four:true,price:[1,2]},special:{four:true,price:[3,4],resv:"yes"},dinner:{ftype:"Full meal",four:true},late:{feats:["late night"],resv:"walk"},dancing:{feats:["dancing"]},outside:{feats:["outdoor"]},cheap:{price:[1],four:true}};
 const occLabel=k=>(OCC.find(o=>o[0]===k)||OCC[0])[1];
 
@@ -486,7 +492,7 @@ $("dirGoogle").onclick=()=>{dirApp="google";store.set("datebars-dir",dirApp);pai
 paintDir();
 // occasion chips + tiles
 OCC.forEach(([k,l])=>{const b=document.createElement("button");b.className="occ";b.type="button";b.dataset.occ=k;b.textContent=l;$("occrow").appendChild(b);const t=document.createElement("button");t.className="tile";t.type="button";t.dataset.occ=k;t.innerHTML=`<span class="l">${l}</span><span class="n" data-n="${k}"></span>`;$("tiles").appendChild(t);});
-document.addEventListener("click",e=>{const b=e.target.closest("[data-occ]");if(!b)return;occasion=b.dataset.occ;update();if(b.classList.contains("occ"))b.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-occ]");if(!b)return;occasion=b.dataset.occ;update();});
 function paintOcc(){document.querySelectorAll("[data-occ]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.occ===occasion));$("railTitle").textContent=occLabel(occasion);$("mapOcc").textContent=occLabel(occasion);}
 
 // ---------- sheets ----------
@@ -601,15 +607,25 @@ document.addEventListener("click",e=>{
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches&&e.target.matches("article.bar"))openDetail(e.target.dataset.id);});
 
 // ---------- home ----------
-let shown=[];
+let shown=[],openGroups=new Set(),expandAll=false;
+sortEl.addEventListener("change",()=>{openGroups.clear();expandAll=false;});
+$("expall").onclick=()=>{expandAll=!expandAll;openGroups.clear();renderHome();};
 function renderHome(){
   const rows=filtered(),s=sortEl.value;shown=rows;
+  const collapsible=rows.length>10&&!qEl.value.trim();
+  $("expall").hidden=!collapsible;$("expall").textContent=expandAll?"Collapse all":"Expand all";
   $("count").textContent=rows.length;
   const n=activeCount();$("filterBadge").hidden=!n;$("filterBadge").textContent=n;
   const list=$("list");list.innerHTML="";
   if(!rows.length){list.innerHTML='<div class="empty">Nothing matches. Loosen a filter or try another occasion.</div>';}
   let last=null,wrap=null;const counts={};rows.forEach(r=>{const k=groupKey(r,s);counts[k]=(counts[k]||0)+1;});
-  rows.forEach(r=>{const k=groupKey(r,s);if(k!==last){last=k;const t=document.createElement("div");t.className="tier";const m=k.match(/^([♥♡]+) (.*)$/);t.innerHTML=m?`<span class="h">${m[1]} ${m[2]}</span><span class="n">${counts[k]}</span>`:`<span class="h" style="color:var(--ink);letter-spacing:0">${esc(k)}</span><span class="n">${counts[k]}</span>`;list.appendChild(t);wrap=document.createElement("div");wrap.className="cards";list.appendChild(wrap);}wrap.appendChild(card(r));});
+  let open=true;
+  rows.forEach(r=>{const k=groupKey(r,s);if(k!==last){last=k;open=!collapsible||expandAll||openGroups.has(k);
+      const t=document.createElement(collapsible?"button":"div");t.className="tier"+(collapsible?" c":"");if(collapsible){t.type="button";t.setAttribute("aria-expanded",open);}
+      const m=k.match(/^([♥♡]+) (.*)$/);t.innerHTML=(m?`<span class="h">${m[1]} ${m[2]}</span>`:`<span class="h" style="color:var(--ink);letter-spacing:0">${esc(k)}</span>`)+`<span class="n">${counts[k]}</span>`+(collapsible?'<span class="chev">›</span>':"");
+      if(collapsible){const key=k;t.onclick=()=>{if(expandAll){expandAll=false;openGroups=new Set(Object.keys(counts).filter(x=>x!==key));}else openGroups.has(key)?openGroups.delete(key):openGroups.add(key);renderHome();};}
+      list.appendChild(t);wrap=document.createElement("div");wrap.className="cards";list.appendChild(wrap);}
+    if(open)wrap.appendChild(card(r));});
   const pb=$("pickbanner");const pr=picked&&byId.get(picked);
   if(pr){pb.hidden=false;pb.innerHTML=`<div class="pickbanner" data-id="${pr.id}"><div><div class="eyebrow">Tonight's pick</div><div class="nm">${pr.name}</div><div class="sm">${pr.hood} · ${distTxt(pr)}</div></div><button class="x" type="button" data-clearpick="1" aria-label="Dismiss">×</button></div>`;}else{pb.hidden=true;pb.innerHTML="";}
 }
@@ -625,7 +641,7 @@ function renderPlanTab(){
   const pr=picked&&byId.get(picked);const pc=$("pickcard");
   if(pr){pc.hidden=false;pc.innerHTML=`<div class="pickcard" data-id="${pr.id}"><div class="eb">Go here</div><div class="nm">${pr.name}</div><div class="sm">${pr.hood} · ${distTxt(pr)} · ${book(pr)}</div><div class="ds">${pr.why}</div></div>`;}else{pc.hidden=true;pc.innerHTML="";}
   const rows=filtered();$("seeAll").textContent="See all "+rows.length;
-  $("rail").innerHTML=rows.slice(0,12).map(r=>`<div class="rcard" data-id="${r.id}"><div class="top"><span class="h">${hearts(r.score)}</span>${heartBtn(r,"")}</div><div class="nm">${r.name}</div><div class="sm">${r.hood} · ${distTxt(r)}</div><div class="ds">${r.why}</div></div>`).join("")||'<div class="empty" style="width:100%">Nothing matches this occasion. Loosen a filter.</div>';
+  $("rail").innerHTML=rows.slice(0,8).map(r=>`<div class="rcard" data-id="${r.id}"><div class="top"><span class="h">${hearts(r.score)}</span>${heartBtn(r,"")}</div><div class="nm">${r.name}</div><div class="sm">${r.hood} · ${distTxt(r)}</div><div class="ds">${r.why}</div></div>`).join("")||'<div class="empty" style="width:100%">Nothing matches this occasion. Loosen a filter.</div>';
 }
 $("seeAll").onclick=()=>showView("home");
 
