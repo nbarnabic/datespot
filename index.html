@@ -76,7 +76,9 @@ body.scrolled .occrow{display:none}
 .tier.c{cursor:pointer;width:100%;border:0;background:none;text-align:left;font-family:inherit}
 .tier .chev{margin-left:auto;color:var(--muted);font-size:18px;line-height:1;transition:transform .15s;display:inline-block}
 .tier[aria-expanded="true"] .chev{transform:rotate(90deg)}
-.metarow .origin{color:var(--ink);border:0;background:none;padding:0;font:inherit;font-size:14px;border-bottom:1px dashed var(--subtle);cursor:pointer}
+.metarow .origin,.maplisthdr .origin{color:var(--ink);border:0;background:none;padding:0;font:inherit;font-size:14px;border-bottom:1px dashed var(--subtle);cursor:pointer}
+.maplisthdr .origin{color:var(--muted)}
+.seg button:disabled{opacity:.4;cursor:default}
 .sortsel{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--ink);font:inherit;font-size:14px;padding:0 16px 0 0;cursor:pointer;text-align:right;direction:rtl;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23a39a90' stroke-width='1.6'/></svg>");background-repeat:no-repeat;background-position:right center}
 .sortsel option{direction:ltr;color:#141414}
@@ -327,7 +329,7 @@ body.locked .tabs,body.locked .view{visibility:hidden}
     </div>
     <div class="occrow" id="occrow"></div>
     <div class="metarow">
-      <span><span id="count"></span> bars from <button class="origin" type="button" data-origin="1" id="originHome">Christopher St PATH</button></span>
+      <span><span id="count"></span> bars<span id="fromWrap"> from <button class="origin" type="button" data-origin="1" id="originHome"></button></span></span>
       <span><button class="linkbtn" id="expall" type="button" hidden>Expand all</button></span>
       <select class="sortsel" id="sort" aria-label="Sort">
         <option value="score">Best for a date</option>
@@ -347,7 +349,7 @@ body.locked .tabs,body.locked .view{visibility:hidden}
     <div class="wm-sm">Date <em>Spot</em></div>
   </div>
   <div class="prompt">What kind of<br><em>night</em> is it?</div>
-  <div class="pillrow"><span class="pillsel"><select id="planDay" aria-label="When"></select></span><button class="pill muted" type="button" data-origin="1">◎ from <span class="originlbl">Christopher St PATH</span></button></div>
+  <div class="pillrow"><span class="pillsel"><select id="planDay" aria-label="When"></select></span><button class="pill muted" type="button" data-origin="1">◎ <span class="fromword">from </span><span class="originlbl"></span></button></div>
   <div class="tiles" id="tiles"></div>
   <div style="padding:14px 20px 0"><button class="primary" id="pickBtn2" type="button">Pick one for me</button></div>
   <div id="pickcard" hidden></div>
@@ -381,7 +383,7 @@ body.locked .tabs,body.locked .view{visibility:hidden}
     <div class="mapchips"><button type="button" id="mapOcc">All</button><button type="button" id="mapCap" aria-pressed="false">≤ 20 min</button></div>
     <button class="locbtn" id="locate" type="button" aria-label="Use my location"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path><circle cx="12" cy="12" r="5"></circle></svg></button>
   </div>
-  <div class="maplisthdr"><b>Closest to you</b><span>from <span class="originlbl">Christopher St PATH</span></span></div>
+  <div class="maplisthdr"><b id="mapListTitle">Closest to you</b><button class="origin" type="button" data-origin="1" style="font-size:13px"><span class="fromword">from </span><span class="originlbl"></span></button></div>
   <div class="maplist noscroll" id="maplist"></div>
 </div>
 
@@ -428,7 +430,7 @@ body.locked .tabs,body.locked .view{visibility:hidden}
     <div class="row"><input id="addr" type="search" placeholder="Address, cross streets, or a place" aria-label="Starting address" autocomplete="off"></div>
     <ul id="sugg" class="sugg" hidden></ul>
     <p class="hint" id="addrMsg"></p>
-    <div class="row"><button class="chip" id="go" type="button">Go</button><button class="chip" id="geo" type="button">Use my location</button><button class="chip" id="originDefault" type="button">Christopher St PATH</button></div>
+    <div class="row"><button class="chip" id="go" type="button">Go</button><button class="chip" id="geo" type="button">Use my location</button><button class="chip" id="originDefault" type="button">Clear</button></div>
   </div>
 </div>
 
@@ -489,7 +491,8 @@ let picks=new Set(store.get("datebars-picks",[]).map(x=>byName.get(x)||x).filter
 let notes=store.get("datebars-notes",{})||{};
 let plan=store.get("datebars-plan",[]).filter(x=>byId.has(x));
 const savePicks=()=>store.set("datebars-picks",[...picks]),saveNotes=()=>store.set("datebars-notes",notes),savePlan=()=>store.set("datebars-plan",plan);
-let origin=[40.7330,-74.0071],originLabel="Christopher St PATH";
+let origin=store.get("datebars-origin",null),originLabel=store.get("datebars-origin-label","")||"";
+const hasOrigin=()=>Array.isArray(origin)&&origin.length===2;
 const OCC=[["all","All"],["first","First date"],["special","Special night"],["dinner","Dinner too"],["late","Late night"],["dancing","Dancing"],["outside","Outside"],["cheap","Cheap & good"]];
 const OCCDEF={first:{feats:["quiet"],four:true,price:[1,2]},special:{four:true,price:[3,4],resv:"yes"},dinner:{ftype:"Full meal",four:true},late:{feats:["late night"],resv:"walk"},dancing:{feats:["dancing"]},outside:{feats:["outdoor"]},cheap:{price:[1],four:true}};
 const occLabel=k=>(OCC.find(o=>o[0]===k)||OCC[0])[1];
@@ -530,8 +533,9 @@ document.addEventListener("click",e=>{if(e.target.closest("[data-origin]")){open
 
 // ---------- starting point ----------
 const addrEl=$("addr"),msgEl=$("addrMsg");
-function setOrigin(pt,label){origin=pt;originLabel=label;msgEl.textContent="Distances from "+label;closeSheet("originSheet");update();}
-$("originDefault").onclick=()=>{addrEl.value="";setOrigin([40.7330,-74.0071],"Christopher St PATH");};
+function setOrigin(pt,label){origin=pt;originLabel=label;store.set("datebars-origin",pt);store.set("datebars-origin-label",label);msgEl.textContent="Distances from "+label;closeSheet("originSheet");update();}
+function clearOrigin(){origin=null;originLabel="";store.set("datebars-origin",null);store.set("datebars-origin-label","");closeSheet("originSheet");update();}
+$("originDefault").onclick=()=>{addrEl.value="";clearOrigin();};
 function gridGeocode(q){const t=q.toLowerCase().replace(/\./g,"");const stM=t.match(/(?:^|\D)(\d{1,3})(?:st|nd|rd|th)?\s*(?:st|street)\b/);const aveWords={"lexington":3.5,"lex":3.5,"park":4,"madison":4.5,"broadway":5.5,"ave a":0,"avenue a":0,"ave b":-1,"avenue b":-1,"ave c":-2,"avenue c":-2,"ave d":-3,"avenue d":-3};let ave=null;const aveM=t.match(/(\d{1,2})(?:st|nd|rd|th)?\s*(?:ave|avenue)\b/);if(aveM)ave=+aveM[1];if(ave===null)for(const k in aveWords)if(t.includes(k)){ave=aveWords[k];break;}if(!stM||ave===null)return null;const st=+stM[1];if(st<1||st>125)return null;const lat=40.7318+(st-14)*0.000579+(ave-1)*0.0011,lng=-73.9821+(st-14)*0.000468+(ave-1)*(-0.00296);return {pt:[lat,lng],label:q.trim()+" (approx.)"};}
 async function geocode(q){q=q.trim();if(!q)return;const m=q.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/);if(m){setOrigin([+m[1],+m[2]],"your point");return;}const g=gridGeocode(q);if(g){setOrigin(g.pt,g.label);return;}msgEl.textContent="Finding "+q+"…";const url="https://nominatim.openstreetmap.org/search?format=json&limit=1&viewbox=-74.06,40.88,-73.90,40.68&bounded=1&q="+encodeURIComponent(q+", New York");try{const r=await fetch(url,{headers:{"Accept":"application/json"}});const j=await r.json();if(!j.length){msgEl.textContent="Couldn't find that nearby. Try adding a cross street or zip.";return;}setOrigin([+j[0].lat,+j[0].lon],j[0].display_name.split(",").slice(0,2).join(","));}catch(e){msgEl.textContent="Address lookup needs a connection. Try cross streets like \"7th St and 2nd Ave\", or use my location.";}}
 $("go").onclick=()=>{hideSugg();geocode(addrEl.value);};
@@ -545,10 +549,11 @@ $("geo").onclick=()=>{$("geo").textContent="Locating…";locate(p=>{$("geo").tex
 
 // ---------- helpers ----------
 function dist(a,b){const R=3959,dLat=(b[0]-a[0])*Math.PI/180,dLon=(b[1]-a[1])*Math.PI/180,la1=a[0]*Math.PI/180,la2=b[0]*Math.PI/180;const h=Math.sin(dLat/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
-function travel(pt){const mi=dist(origin,pt)*1.3;const walk=Math.round(mi*20);if(walk<=25)return {min:walk,mode:"walk"};return {min:Math.round(8+mi*7),mode:"transit"};}
+function travel(pt){if(!hasOrigin())return {min:null,mode:""};const mi=dist(origin,pt)*1.3;const walk=Math.round(mi*20);if(walk<=25)return {min:walk,mode:"walk"};return {min:Math.round(8+mi*7),mode:"transit"};}
 function walkMin(a,b){return Math.max(1,Math.round(dist(a,b)*1.3*20));}
 function hearts(n){return "♥".repeat(n)+"♡".repeat(5-n)}
-const distTxt=r=>r.tr.min+" min "+r.tr.mode;
+const distTxt=r=>r.tr.min==null?"":r.tr.min+" min "+r.tr.mode;
+const dot=(...xs)=>xs.filter(x=>x!==""&&x!=null).join(" · ");
 const book=r=>r.res.startsWith("reservations")?"reservations":"walk-in";
 function appleUrl(r){return "https://maps.apple.com/?daddr="+r.pt[0]+","+r.pt[1]+"&dirflg=w";}
 function gmapUrl(r){return "https://www.google.com/maps/dir/?api=1&destination="+r.pt[0]+","+r.pt[1]+"&travelmode=walking";}
@@ -596,9 +601,9 @@ function baseRows(){ // manual filters (sheet + search), no occasion, no sort
   return rows;
 }
 function occRows(rows,k){const P=OCCDEF[k];if(!P)return rows;return rows.filter(r=>(!P.feats||P.feats.every(f=>r.feats.includes(f)))&&(!P.four||r.score>=4)&&(!P.price||P.price.includes(r.cost))&&(!P.ftype||r.type===P.ftype)&&(P.resv!=="yes"||r.res.startsWith("reservations"))&&(P.resv!=="walk"||r.res.startsWith("walk-in")));}
-function sortRows(rows,s){const order=["Drinks only","Snacks & small plates","Bar food","Full meal","Unknown"];return rows.slice().sort((a,b)=>s==="score"?(b.score-a.score||a.tr.min-b.tr.min):s==="dist"?(a.tr.min-b.tr.min||b.score-a.score):s==="type"?(order.indexOf(a.type)-order.indexOf(b.type)||b.score-a.score):(a.cost-b.cost||b.score-a.score));}
+function sortRows(rows,s){const order=["Drinks only","Snacks & small plates","Bar food","Full meal","Unknown"];if(!hasOrigin()&&s==="dist")s="score";const tm=r=>r.tr.min==null?0:r.tr.min;return rows.slice().sort((a,b)=>s==="score"?(b.score-a.score||tm(a)-tm(b)):s==="dist"?(tm(a)-tm(b)||b.score-a.score):s==="type"?(order.indexOf(a.type)-order.indexOf(b.type)||b.score-a.score):(a.cost-b.cost||b.score-a.score));}
 function filtered(){return sortRows(occRows(baseRows(),occasion),sortEl.value);}
-function groupKey(r,s){if(s==="score")return hearts(r.score)+" "+r.score+(r.score===1?" heart":" hearts");if(s==="type")return r.type;if(s==="cheap")return "$".repeat(r.cost);const m=r.tr.min;return m<10?"Under 10 min":m<20?"10 to 20 min":m<30?"20 to 30 min":"Over 30 min";}
+function groupKey(r,s){if(!hasOrigin()&&s==="dist")s="score";if(s==="score")return hearts(r.score)+" "+r.score+(r.score===1?" heart":" hearts");if(s==="type")return r.type;if(s==="cheap")return "$".repeat(r.cost);const m=r.tr.min;return m<10?"Under 10 min":m<20?"10 to 20 min":m<30?"20 to 30 min":"Over 30 min";}
 
 // ---------- pieces ----------
 function heartBtn(r,cls){return `<button class="heart ${cls||""}" type="button" data-save="${r.id}" aria-pressed="${picks.has(r.id)}" aria-label="${picks.has(r.id)?"Saved":"Save"}">${HEART}</button>`;}
@@ -609,7 +614,7 @@ function card(r){
   d.innerHTML=`<div class="top"><div><h2 class="name">${r.name}${r.status?`<span class="tag ${r.status}">${r.status}</span>`:""}</h2><div class="meta">${r.hood} · ${"$".repeat(r.cost)} · ${r.type}</div></div>${heartBtn(r)}</div>
     <p class="desc">${r.why}</p>
     ${note?`<p class="note1">“${esc(note)}”</p>`:""}
-    <div class="bottom"><div class="tags">${r.feats.slice(0,2).map(f=>`<span>${f}</span>`).join("")}</div><div class="right">${r.rurl?`<a class="rsv" href="${r.rurl}" target="_blank" rel="noopener">Reserve ↗</a>`:""}${dirLink(r,"dirbtn",ARROW+distTxt(r))}</div></div>`;
+    <div class="bottom"><div class="tags">${r.feats.slice(0,2).map(f=>`<span>${f}</span>`).join("")}</div><div class="right">${r.rurl?`<a class="rsv" href="${r.rurl}" target="_blank" rel="noopener">Reserve ↗</a>`:""}${dirLink(r,"dirbtn",ARROW+(hasOrigin()?distTxt(r):"Directions"))}</div></div>`;
   return d;
 }
 function detailHtml(r){
@@ -620,7 +625,7 @@ function detailHtml(r){
     <p class="why">${r.why}</p>
     <p class="food"><span class="fl">${r.type}</span> ${r.food}</p>
     ${r.feats.length||r.cuis.length?`<div class="tags">${r.feats.map(f=>`<span>${f}</span>`).join("")}${r.cuis.map(c=>`<span class="cu">${c}</span>`).join("")}</div>`:""}
-    <dl>${r.hours?`<dt>Hours</dt><dd>${esc(hoursLine(r,now))}${st.txt?` · <span class="hrs">${esc(st.txt)}</span>`:""}</dd>`:""}<dt>Reservations</dt><dd>${r.res}</dd>${closedTxt(r)?`<dt>Closed</dt><dd>${closedTxt(r)}</dd>`:""}<dt>From ${esc(originLabel)}</dt><dd>${distTxt(r)}</dd></dl>
+    <dl>${r.hours?`<dt>Hours</dt><dd>${esc(hoursLine(r,now))}${st.txt?` · <span class="hrs">${esc(st.txt)}</span>`:""}</dd>`:""}<dt>Reservations</dt><dd>${r.res}</dd>${closedTxt(r)?`<dt>Closed</dt><dd>${closedTxt(r)}</dd>`:""}${hasOrigin()?`<dt>From ${esc(originLabel)}</dt><dd>${distTxt(r)}</dd>`:""}</dl>
     <div class="noteedit"><span class="sl">My note (private to this phone)</span><textarea rows="3" placeholder="Best table, what to order, who you went with…">${esc(note)}</textarea><div class="row"><button class="chip small" type="button" data-notesave="${r.id}">Save note</button></div></div>`;
 }
 let detailId=null;
@@ -654,7 +659,7 @@ function renderHome(){
       list.appendChild(t);wrap=document.createElement("div");wrap.className="cards";list.appendChild(wrap);}
     if(open)wrap.appendChild(card(r));});
   const pb=$("pickbanner");const pr=picked&&byId.get(picked);
-  if(pr){pb.hidden=false;pb.innerHTML=`<div class="pickbanner" data-id="${pr.id}"><div><div class="eyebrow">Tonight's pick</div><div class="nm">${pr.name}</div><div class="sm">${pr.hood} · ${distTxt(pr)}</div></div><button class="x" type="button" data-clearpick="1" aria-label="Dismiss">×</button></div>`;}else{pb.hidden=true;pb.innerHTML="";}
+  if(pr){pb.hidden=false;pb.innerHTML=`<div class="pickbanner" data-id="${pr.id}"><div><div class="eyebrow">Tonight's pick</div><div class="nm">${pr.name}</div><div class="sm">${dot(pr.hood,distTxt(pr))}</div></div><button class="x" type="button" data-clearpick="1" aria-label="Dismiss">×</button></div>`;}else{pb.hidden=true;pb.innerHTML="";}
 }
 function pickOne(){const rows=filtered().filter(r=>r.id!==lastPicked);const pool=rows.length?rows:filtered();if(!pool.length){picked=null;update();return;}picked=pool[Math.floor(Math.random()*pool.length)].id;lastPicked=picked;update();}
 $("pickBtn").onclick=()=>{pickOne();window.scrollTo({top:0,behavior:"smooth"});};
@@ -666,9 +671,9 @@ function renderPlanTab(){
   const base=baseRows();
   OCC.forEach(([k])=>{const el=document.querySelector(`[data-n="${k}"]`);if(el){const n=occRows(base,k).length;el.textContent=n+(n===1?" bar":" bars");}});
   const pr=picked&&byId.get(picked);const pc=$("pickcard");
-  if(pr){pc.hidden=false;pc.innerHTML=`<div class="pickcard" data-id="${pr.id}"><div class="eb">Go here</div><div class="nm">${pr.name}</div><div class="sm">${pr.hood} · ${distTxt(pr)} · ${book(pr)}</div><div class="ds">${pr.why}</div><div class="acts2"><button class="act primary" type="button" data-plan="${pr.id}" aria-pressed="${plan.includes(pr.id)}">${plan.includes(pr.id)?"In tonight ✓":"Make it stop "+(plan.length+1)}</button>${dirLink(pr,"act","Directions ↗")}<button class="act" type="button" id="pickAgain">Another</button></div></div>`;pc.querySelector("#pickAgain").onclick=()=>pickOne();}else{pc.hidden=true;pc.innerHTML="";}
+  if(pr){pc.hidden=false;pc.innerHTML=`<div class="pickcard" data-id="${pr.id}"><div class="eb">Go here</div><div class="nm">${pr.name}</div><div class="sm">${dot(pr.hood,distTxt(pr),book(pr))}</div><div class="ds">${pr.why}</div><div class="acts2"><button class="act primary" type="button" data-plan="${pr.id}" aria-pressed="${plan.includes(pr.id)}">${plan.includes(pr.id)?"In tonight ✓":"Make it stop "+(plan.length+1)}</button>${dirLink(pr,"act","Directions ↗")}<button class="act" type="button" id="pickAgain">Another</button></div></div>`;pc.querySelector("#pickAgain").onclick=()=>pickOne();}else{pc.hidden=true;pc.innerHTML="";}
   const rows=filtered().filter(r=>!closedOnDay(r,planDay));$("seeAll").textContent="See all "+rows.length;$("railTitle").textContent=occLabel(occasion)+" "+planDayLabel();
-  $("rail").innerHTML=rows.slice(0,8).map(r=>`<div class="rcard" data-id="${r.id}"><div class="top"><span class="h">${hearts(r.score)}</span>${heartBtn(r,"")}</div><div class="nm">${r.name}</div><div class="sm">${r.hood} · ${"$".repeat(r.cost)} · ${r.type} · ${distTxt(r)}</div><div class="ds">${r.why}</div><div class="acts2"><button class="act${plan.includes(r.id)?" primary":""}" type="button" data-plan="${r.id}" aria-pressed="${plan.includes(r.id)}">${plan.includes(r.id)?"In tonight ✓":"Add to tonight"}</button>${dirLink(r,"act","Directions ↗")}</div></div>`).join("")||'<div class="empty" style="width:100%">Nothing matches this occasion. Loosen a filter.</div>';
+  $("rail").innerHTML=rows.slice(0,8).map(r=>`<div class="rcard" data-id="${r.id}"><div class="top"><span class="h">${hearts(r.score)}</span>${heartBtn(r,"")}</div><div class="nm">${r.name}</div><div class="sm">${dot(r.hood,"$".repeat(r.cost),r.type,distTxt(r))}</div><div class="ds">${r.why}</div><div class="acts2"><button class="act${plan.includes(r.id)?" primary":""}" type="button" data-plan="${r.id}" aria-pressed="${plan.includes(r.id)}">${plan.includes(r.id)?"In tonight ✓":"Add to tonight"}</button>${dirLink(r,"act","Directions ↗")}</div></div>`).join("")||'<div class="empty" style="width:100%">Nothing matches this occasion. Loosen a filter.</div>';
 }
 $("seeAll").onclick=()=>showView("home");
 
@@ -683,7 +688,7 @@ function renderShort(){
   if(!rows.length){el.innerHTML='<div class="empty">Nothing saved yet. Tap the heart on any bar and it lands here.</div>';return;}
   el.innerHTML=rows.map(r=>{const note=notes[r.id]||"";const warn=closedTxt(r);return `<div class="shrow" data-id="${r.id}">
     <div class="top" data-id="${r.id}"><div class="nm">${r.name}</div><span class="h">${hearts(r.score)}</span></div>
-    <div class="sm">${r.hood} · ${"$".repeat(r.cost)} · ${book(r)} · ${distTxt(r)}</div>
+    <div class="sm">${dot(r.hood,"$".repeat(r.cost),book(r),distTxt(r))}</div>
     ${warn?`<div class="warn">${warn}</div>`:""}
     <div class="notebox ${note?"":"empty"}" data-noteedit="${r.id}" role="button" tabindex="0">${note?esc(note):"Add a note"}</div>
     <div class="acts">${dirLink(r,"btn","Directions")}${r.rurl?`<a class="btn rsv2" href="${r.rurl}" target="_blank" rel="noopener">Reserve ↗</a>`:""}<button class="btn outline x" type="button" data-unsave="${r.id}" aria-label="Remove from shortlist">×</button></div></div>`;}).join("");
@@ -713,7 +718,7 @@ function renderTonight(){
   else ideas.innerHTML="";
   const saved=ALL.filter(r=>picks.has(r.id)).sort((a,b)=>a.tr.min-b.tr.min);
   $("savedEb").textContent="Saved · "+saved.length;
-  $("savedrows").innerHTML=saved.length?saved.map(r=>{const on=plan.includes(r.id);const note=notes[r.id];return `<div class="srow" data-id="${r.id}"><div style="flex:1;min-width:0"><div class="nm">${r.name}</div><div class="sm">${r.hood} · ${distTxt(r)}${note?` · “${esc(note)}”`:""}</div></div><button class="toggle" type="button" data-plan="${r.id}" aria-pressed="${on}" aria-label="${on?"Remove from tonight":"Add to tonight"}">${on?"✓":"+"}</button></div>`;}).join(""):'<div class="empty">Save a few bars first, then build tonight from here.</div>';
+  $("savedrows").innerHTML=saved.length?saved.map(r=>{const on=plan.includes(r.id);const note=notes[r.id];return `<div class="srow" data-id="${r.id}"><div style="flex:1;min-width:0"><div class="nm">${r.name}</div><div class="sm">${dot(r.hood,distTxt(r),note?"“"+esc(note)+"”":"")}</div></div><button class="toggle" type="button" data-plan="${r.id}" aria-pressed="${on}" aria-label="${on?"Remove from tonight":"Add to tonight"}">${on?"✓":"+"}</button></div>`;}).join(""):'<div class="empty">Save a few bars first, then build tonight from here.</div>';
 }
 function planText(){const it=itinerary();let t=(planDayLabel()==="tonight"?"Tonight":planDayLabel().charAt(0).toUpperCase()+planDayLabel().slice(1))+":\n";it.forEach((x,i)=>{const r=x.r;if(i)t+="   ↓ "+x.walk+" min walk\n";t+=clock(x.arrive)+"  "+r.name+" ("+r.hood+", "+r.where+") "+"$".repeat(r.cost)+(r.url?" "+r.url:"")+"\n";});const stops=it.map(x=>x.r);const last=stops[stops.length-1];const bk=last?backupFor(last):"";if(bk)t+="Backup near the last stop: "+bk;return t.trim();}
 function backupFor(r){const c=ALL.filter(x=>x.id!==r.id&&x.status!=="closed"&&x.status!=="unverified"&&x.score>=r.score-1).map(x=>({x,m:walkMin(r.pt,x.pt)})).filter(o=>o.m<=12).sort((a,b)=>a.m-b.m||b.x.score-a.x.score)[0];return c?c.x.name+" ("+c.m+" min walk)":"";}
@@ -738,7 +743,7 @@ VIEWS.forEach(x=>$("tab-"+x).onclick=()=>showView(x));
 window.addEventListener("scroll",()=>document.body.classList.toggle("scrolled",window.scrollY>28),{passive:true});
 
 // ---------- update everything ----------
-function update(){ALL.forEach(r=>r.tr=travel(r.pt));document.querySelectorAll(".originlbl,#originHome").forEach(e=>e.textContent=originLabel);paintOcc();renderHome();renderPlanTab();renderShort();renderTonight();if(map)renderMap();}
+function update(){ALL.forEach(r=>r.tr=travel(r.pt));document.querySelectorAll(".originlbl,#originHome").forEach(e=>e.textContent=hasOrigin()?originLabel:"Set a starting point");document.querySelectorAll(".fromword").forEach(e=>e.hidden=!hasOrigin());$("fromWrap").innerHTML=hasOrigin()?` from <button class="origin" type="button" data-origin="1" id="originHome">${esc(originLabel)}</button>`:` · <button class="origin" type="button" data-origin="1" id="originHome">Set a starting point</button>`;$("shNear").disabled=!hasOrigin();if(!hasOrigin()&&shSort==="near")shSort="best";paintOcc();renderHome();renderPlanTab();renderShort();renderTonight();if(map)renderMap();}
 
 // ---------- map ----------
 let map=null,L=null,pinLayer=null,planLayer=null,meMarker=null,leafletP=null,geoP=null,cv=null,G=null,hoodPolys={},gridL=null,majorL=null,stLayer=null,mapRows=[],hlId=null;
@@ -782,7 +787,7 @@ $("mapOcc").onclick=()=>{showView("plan");};
 $("locate").onclick=()=>{locate(p=>{const pt=[p.coords.latitude,p.coords.longitude];if(meMarker)meMarker.setLatLng(pt);else meMarker=L.marker(pt,{icon:L.divIcon({className:"",html:'<span class="pin me"></span>',iconSize:null}),interactive:false,keyboard:false}).addTo(map);map.setView(pt,15);setOrigin(pt,"my location");},()=>{$("maplist").insertAdjacentHTML("afterbegin",'<div class="hint" style="padding:6px 22px">Location blocked. Allow it in Settings.</div>');});};
 function renderMap(){
   if(!map)return;pinLayer.clearLayers();planLayer.clearLayers();
-  let rows=sortRows(occRows(baseRows(),occasion),"dist");if(mapCap)rows=rows.filter(r=>r.tr.min<=20);mapRows=rows;
+  let rows=sortRows(occRows(baseRows(),occasion),"dist");if(mapCap&&hasOrigin())rows=rows.filter(r=>r.tr.min<=20);mapRows=rows;$("mapListTitle").textContent=hasOrigin()?"Closest to you":"Highest rated";$("mapCap").hidden=!hasOrigin();
   const z=map.getZoom();
   if(z<13.75){ // clusters by neighborhood
     const g={};rows.forEach(r=>(g[r.hood]=g[r.hood]||[]).push(r));
@@ -796,7 +801,7 @@ function renderMap(){
 }
 function paintMapList(){
   const rows=mapRows;
-  $("maplist").innerHTML=rows.length?rows.map((r,i)=>`<div class="mrow${hlId===r.id?" hl":""}" data-id="${r.id}"><span class="rank" style="${i<3?"border-color:var(--rose);color:var(--rose)":""}">${i+1}</span><div style="flex:1;min-width:0"><div class="nm">${r.name}</div><div class="sm">${r.hood} · <b>${hearts(r.score)}</b></div></div><span class="d">${r.tr.min} min<small>${r.tr.mode}</small></span></div>`).join(""):'<div class="empty">Nothing matches here. Loosen a filter or turn off ≤ 20 min.</div>';
+  $("maplist").innerHTML=rows.length?rows.map((r,i)=>`<div class="mrow${hlId===r.id?" hl":""}" data-id="${r.id}"><span class="rank" style="${i<3?"border-color:var(--rose);color:var(--rose)":""}">${i+1}</span><div style="flex:1;min-width:0"><div class="nm">${r.name}</div><div class="sm">${r.hood} · <b>${hearts(r.score)}</b></div></div>${hasOrigin()?`<span class="d">${r.tr.min} min<small>${r.tr.mode}</small></span>`:`<span class="d">${"$".repeat(r.cost)}</span>`}</div>`).join(""):'<div class="empty">Nothing matches here. Loosen a filter or turn off ≤ 20 min.</div>';
 }
 darkMq.addEventListener("change",()=>{if(map){location.reload();}});
 
