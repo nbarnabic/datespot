@@ -719,6 +719,7 @@ async function decrypt(pass){
   const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(ENC.iv)},k,b64(ENC.ct));
   return JSON.parse(new TextDecoder().decode(pt));
 }
+const BUILD="2026-09-28.0825";
 function start(B){
 // row: hood, name, where, why, score, cost, (unused), (unused), food, lat, lng, res, closed, feats, status, url, resvUrl, cuisines, id, hours, kitchenClose
 const $=id=>document.getElementById(id);
@@ -1128,7 +1129,7 @@ let map=null,L=null,pinLayer=null,planLayer=null,meMarker=null,leafletP=null,geo
 const darkMq=matchMedia("(prefers-color-scheme: dark)");
 const cssVar=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 function loadLeaflet(){if(leafletP)return leafletP;leafletP=new Promise((res,rej)=>{const css=document.createElement("link");css.rel="stylesheet";css.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(css);const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";s.onload=()=>res(window.L);s.onerror=()=>{leafletP=null;rej(new Error("load"));};document.head.appendChild(s);});return leafletP;}
-function loadGeo(){if(geoP)return geoP;geoP=(window.__GEO__?Promise.resolve(window.__GEO__):fetch("map.json",{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("geo");return r.json();})).catch(e=>{geoP=null;throw e;});return geoP;}
+function loadGeo(){if(geoP)return geoP;geoP=(window.__GEO__?Promise.resolve(window.__GEO__):fetch("map.json?v="+BUILD,{cache:"no-cache"}).then(r=>{if(!r.ok)throw new Error("geo");return r.json();})).catch(e=>{geoP=null;throw e;});return geoP;}
 function buildBase(){
   const poly=(rings,o)=>L.polygon(rings,Object.assign({renderer:cv,interactive:false},o)).addTo(map);
   G.land.forEach(r=>poly([r],{fillColor:cssVar("--land"),fillOpacity:1,color:cssVar("--shore"),weight:1,opacity:.9}));
@@ -1265,7 +1266,8 @@ function renderSettings(){const el=$("settings");const P=profile||{};const lbl=(
     <div class="setrow"><div><div class="k">How Date Spot works</div><div class="v">The five tabs, and a few tips</div></div><button class="edit" type="button" id="showGuide">Open</button></div>
     <div class="grp">Reset</div>
     <div class="setrow"><div><div class="k">Run setup again</div><div class="v">Walk through every question</div></div><button class="edit" type="button" data-editstep="0" data-all="1">Start</button></div>
-    <div class="setrow danger"><div><div class="k">Clear this phone</div><div class="v">Shortlist, notes, date plan, and answers</div></div><button class="edit" type="button" id="wipe">Clear</button></div></div>`;
+    <div class="setrow danger"><div><div class="k">Clear this phone</div><div class="v">Shortlist, notes, date plan, and answers</div></div><button class="edit" type="button" id="wipe">Clear</button></div>
+    <p class="sub" style="margin-top:14px">Build ${BUILD}. If something looks stale, close the app fully and reopen it.</p></div>`;
   el.querySelector("#shead").onclick=()=>{settingsOpen=!settingsOpen;store.set("datebars-settings-open",settingsOpen);el.classList.toggle("expanded",settingsOpen);};
   el.querySelectorAll("[data-editstep]").forEach(b=>b.onclick=()=>{const v=b.dataset.editstep;if(v.startsWith("p:"))openPartner(v.slice(2));else openOnboard(+v,!b.dataset.all);});
   el.querySelector("#showGuide").onclick=()=>{obGuideOnly=true;openOnboard(0,false);};
