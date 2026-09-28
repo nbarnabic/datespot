@@ -143,7 +143,8 @@ body.scrolled .modeseg{display:none}
 .stop .when{flex:none;text-align:right;font-size:14px;color:var(--ink)}
 .stop .when small{display:block;font-size:11px;color:var(--muted)}
 .stop .warn{font-size:12px;color:var(--rose);margin-top:2px}
-.stop{align-items:flex-start;cursor:pointer}
+.plancard .stop{align-items:flex-start;cursor:pointer}
+.plancard .stop .num{margin-top:2px}
 .stop .when{margin-top:2px}
 .stop .dacts .act{padding:5px 11px;font-size:13px}
 .ideas{margin:0 20px;padding-top:6px}
@@ -221,9 +222,9 @@ body.scrolled .modeseg{display:none}
 .settings h3{margin:0;font-size:22px;font-weight:600}
 .settings .shead{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:4px 0}
 .settings .shead .chev{color:var(--muted);font-size:20px;transition:transform .15s}
-.settings.open .shead .chev{transform:rotate(90deg)}
+.settings.expanded .shead .chev{transform:rotate(90deg)}
 .settings .body{display:none}
-.settings.open .body{display:block}
+.settings.expanded .body{display:block}
 .partner{margin-top:8px}
 .settings .sub{margin:0 0 12px}
 .setrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -1227,7 +1228,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-settings]"
 function renderSettings(){const el=$("settings");const P=profile||{};const lbl=(k,v)=>{const st=OB.find(x=>x.k===k);if(!st||!st.opts)return v||"Not set";if(st.one){const o=st.opts.find(x=>x[0]===v);return o?o[1]:"Not set";}return (v||[]).length?(v.map(x=>(st.opts.find(o=>o[0]===x)||[x,x])[1]).join(", ")):"None";};
   const idx=k=>OB.findIndex(x=>x.k===k);
   const row=(k,label,val,step,cls)=>`<div class="setrow ${cls||""}"><div><div class="k">${label}</div><div class="v">${esc(val)}</div></div><button class="edit" type="button" data-editstep="${step}">Edit</button></div>`;
-  el.classList.toggle("open",settingsOpen);
+  el.classList.toggle("expanded",settingsOpen);
   const partnerRows=isCouple()||prof("status")==="new"?`<div class="grp">Your partner</div>
     <p class="sub">Their preferences count too: the app leans sober-friendly if either of you doesn't drink, shows dispensaries only if both are fine with it, and flags food for both.</p>
     ${row("pdrink","Partner drinking",lbl("drink",(P.partner||{}).drink),"p:drink")}
@@ -1254,7 +1255,7 @@ function renderSettings(){const el=$("settings");const P=profile||{};const lbl=(
     <div class="grp">Reset</div>
     <div class="setrow"><div><div class="k">Run setup again</div><div class="v">Walk through every question</div></div><button class="edit" type="button" data-editstep="0" data-all="1">Start</button></div>
     <div class="setrow danger"><div><div class="k">Clear this phone</div><div class="v">Shortlist, notes, date plan, and answers</div></div><button class="edit" type="button" id="wipe">Clear</button></div></div>`;
-  el.querySelector("#shead").onclick=()=>{settingsOpen=!settingsOpen;store.set("datebars-settings-open",settingsOpen);el.classList.toggle("open",settingsOpen);};
+  el.querySelector("#shead").onclick=()=>{settingsOpen=!settingsOpen;store.set("datebars-settings-open",settingsOpen);el.classList.toggle("expanded",settingsOpen);};
   el.querySelectorAll("[data-editstep]").forEach(b=>b.onclick=()=>{const v=b.dataset.editstep;if(v.startsWith("p:"))openPartner(v.slice(2));else openOnboard(+v,!b.dataset.all);});
   el.querySelector("#showGuide").onclick=()=>{obGuideOnly=true;openOnboard(0,false);};
   el.querySelector("#setDir").onclick=()=>{dirApp=dirApp==="google"?"apple":"google";store.set("datebars-dir",dirApp);paintDir();update();};
