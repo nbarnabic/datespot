@@ -37,6 +37,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{scroll-padding-top:0}
+html,body{overflow-x:hidden;max-width:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Fraunces",Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 button{font-family:inherit}
 input,select,textarea{font-size:16px}
@@ -284,10 +285,10 @@ body.scrolled .modeseg{display:none}
 .leaflet-control-attribution a{color:var(--muted)!important}
 /* ---- tab bar */
 .tabs{position:fixed;left:0;right:0;bottom:0;height:var(--tabh);padding:10px 0 env(safe-area-inset-bottom,0px);background:var(--tabbg);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:30}
-.tabs button{border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;transition:color .15s}
+.tabs button{border:0;background:transparent;padding:0 2px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;transition:color .15s;min-width:0;overflow:hidden}
 .tabs button svg{width:22px;height:22px}
 .tabs button[aria-current="page"]{color:var(--rose)}
-.tabs button span{white-space:nowrap;font-size:10px}
+.tabs button span{white-space:normal;font-size:10px;line-height:1.15;text-align:center;max-width:100%}
 body.locked .tabs,body.locked .view{visibility:hidden}
 /* ---- sheets */
 .sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:5000;display:flex;align-items:flex-end;justify-content:center}
@@ -350,7 +351,7 @@ body.locked .tabs,body.locked .view{visibility:hidden}
   .tabs button:not(.sideorigin):hover{background:var(--card)}
   .tabs button[aria-current="page"]:not(.sideorigin){background:var(--card);color:var(--rose)}
   .tabs button svg{width:20px;height:20px}
-  .tabs button span{flex:1;text-align:left;display:flex;justify-content:space-between}
+  .tabs button span{flex:1;text-align:left;display:flex;justify-content:space-between;white-space:nowrap;line-height:1.3}
   .tabs button span b{font-weight:400;font-size:13px;color:var(--muted)}
   .tabs .sidespacer{display:block;flex:1}
   .tabs .sidewm,.tabs .sidespacer{display:block}
@@ -720,6 +721,8 @@ function start(B){
 // row: hood, name, where, why, score, cost, (unused), (unused), food, lat, lng, res, closed, feats, status, url, resvUrl, cuisines, id, hours, kitchenClose
 const $=id=>document.getElementById(id);
 const HOODS=["West Village","East Village","LES","Soho","Gramercy","Flatiron","Nomad","Chelsea","Greenwich Village","Kips Bay","Midtown","Hell's Kitchen","Tribeca","Downtown","UES","UWS","Central Park","Hoboken"];
+const AREAS=[["NJ · Hoboken",["Hoboken"]],["NJ · Jersey City",[]],["Manhattan",["West Village","East Village","LES","Soho","Gramercy","Flatiron","Nomad","Chelsea","Greenwich Village","Kips Bay","Midtown","Hell's Kitchen","Tribeca","Downtown","UES","UWS","Central Park"]],["Greater NYC · Brooklyn",[]],["Greater NYC · Queens",[]],["Greater NYC · Bronx",[]],["Greater NYC · Staten Island",[]]];
+const AREA_BY_ROW=r=>r[28]||null;
 const CATS=["Museum","Gallery","Park","Garden","Walk","View","Boat","Market","Bookstore","Cafe","Activity","Cinema","Music","Comedy","Theater","Dispensary"];
 const INDOOR=new Set(["Museum","Gallery","Bookstore","Cinema","Music","Comedy","Theater","Cafe","Activity"]);
 const slug=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/&/g," and ").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
@@ -729,7 +732,9 @@ const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 function foodType(f){const t=f.toLowerCase();if(t.startsWith("unknown"))return "Unknown";if(/^(drinks only|cocktails only|light snacks only|light bites only|light bar snacks only|no real food)/.test(t))return "Drinks only";if(/^(dinner|full dinner|full meal|gastropub dinner|italian dinner|cafe:|cooking class)/.test(t))return "Full meal";if(/^(bar food|gastropub menu|elevated bar food|bar snacks, plus|food trucks)/.test(t))return "Bar food";return "Snacks & small plates";}
 const ALL=B.map(r=>{const kind=r[21]||"bar",cat=r[22]||"";return {id:r[18]||slug(r[1]),hood:r[0],name:r[1],where:r[2],why:r[3],score:r[4],cost:r[5],food:r[8],type:kind==="place"?cat:foodType(r[8]),pt:[r[9],r[10]],res:r[11]||"",closed:r[12]||"",feats:r[13]||[],status:r[14]||"",url:r[15]||"",rurl:r[16]||"",cuis:r[17]||[],hours:r[19]||null,kclose:r[20]||"",kind,cat,zp:r[23]||"",tickets:r[24]||"",best:r[25]||"",hv:!!r[26],license:r[27]||""};});
 const byId=new Map(ALL.map(r=>[r.id,r])),byName=new Map(ALL.map(r=>[r.name,r.id]));
-ALL.forEach(r=>{if(!HOODS.includes(r.hood))HOODS.push(r.hood);});
+ALL.forEach((r,i)=>{if(!HOODS.includes(r.hood))HOODS.push(r.hood);});
+// place every neighborhood into its area group (data can carry an explicit area in field 28)
+B.forEach(r=>{const h=r[0],a=r[28];if(!h)return;const g=AREAS.find(x=>x[1].includes(h));if(g)return;const key=a==="Jersey City"?"NJ · Jersey City":a==="Brooklyn"?"Greater NYC · Brooklyn":a==="Queens"?"Greater NYC · Queens":a==="Bronx"?"Greater NYC · Bronx":a==="Staten Island"?"Greater NYC · Staten Island":a==="Hoboken"?"NJ · Hoboken":"Manhattan";const grp=AREAS.find(x=>x[0]===key);if(!grp[1].includes(h))grp[1].push(h);});
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 
 // ---------- state ----------
@@ -792,7 +797,7 @@ const seqSlots=()=>slots;
 const sortEl=$("sort"),qEl=$("q"),hoodEl=$("hood"),ftypeEl=$("ftype"),resvEl=$("resv"),dayEl=$("day"),fourEl=$("fourPlus"),newEl=$("newOnly"),unvEl=$("hideUnv"),openNowEl=$("openNow"),openLateEl=$("openLate");
 dayOptions($("planDay"));dayOptions($("planDay2"));$("planDay").onchange=e=>setPlanDay(e.target.value);$("planDay2").onchange=e=>setPlanDay(e.target.value);
 {const sa=$("startAt");for(let m=17*60;m<=23*60;m+=30){const o=document.createElement("option");o.value=m;o.textContent="Start "+fmt12(String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0"));sa.appendChild(o);}sa.value=String(startAt);sa.onchange=()=>{startAt=+sa.value;renderTonight();};}
-HOODS.forEach(h=>{const o=document.createElement("option");o.textContent=h;hoodEl.appendChild(o);const o2=document.createElement("option");o2.textContent=h;$("sgHood").appendChild(o2);});
+AREAS.forEach(([label,list])=>{if(!list.length)return;[hoodEl,$("sgHood")].forEach(sel=>{const og=document.createElement("optgroup");og.label=label;list.forEach(h=>{const o=document.createElement("option");o.textContent=h;og.appendChild(o);});sel.appendChild(og);});});
 hoodEl.addEventListener("change",()=>{hood=hoodEl.value;update();});
 [ftypeEl,resvEl,dayEl,fourEl,newEl,unvEl,openNowEl,openLateEl].forEach(e=>e.addEventListener("change",()=>update()));
 sortEl.addEventListener("change",()=>{store.set("datebars-sort",sortEl.value);update();});
@@ -1140,11 +1145,11 @@ async function openMap(){
   if(!map){
     try{[L,G]=await Promise.all([loadLeaflet(),loadGeo()]);}catch(e){$("maplist").innerHTML='<div class="empty">Couldn\'t load the map. Check your connection and tap Map again.</div>';return;}
     if(map)return;
-    map=L.map("map",{zoomControl:false,zoomSnap:.25,minZoom:11,maxZoom:17.5,attributionControl:true,maxBoundsViscosity:.8});
+    map=L.map("map",{zoomControl:false,zoomSnap:.25,minZoom:9.5,maxZoom:17.5,attributionControl:true,maxBoundsViscosity:.8});
     L.control.zoom({position:"bottomright",zoomInTitle:"Zoom in",zoomOutTitle:"Zoom out"}).addTo(map);
     map.attributionControl.setPrefix(false).addAttribution('Map data &copy; OpenStreetMap contributors, NYC Open Data');
     cv=L.canvas({padding:.5});
-    map.setMaxBounds(L.latLngBounds(G.land.flat()).pad(.35));
+    map.setMaxBounds(L.latLngBounds(G.land.flat()).pad(.25));
     fitAll();
     buildBase();
     pinLayer=L.layerGroup().addTo(map);planLayer=L.layerGroup().addTo(map);
@@ -1152,7 +1157,8 @@ async function openMap(){
     setTimeout(()=>{map.invalidateSize();fitAll();},60);
   }else setTimeout(()=>map.invalidateSize(),60);
 }
-function fitAll(){if(!map)return;map.fitBounds(L.latLngBounds(G.land.flat()),{padding:[16,16]});}
+const CORE=[[40.68,-74.05],[40.83,-73.90]];
+function fitAll(){if(!map)return;map.fitBounds(L.latLngBounds(CORE),{padding:[16,16]});}
 function fitHood(h){const pts=ALL.filter(r=>h==="All"||r.hood===h).map(r=>r.pt);if(pts.length)map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:16});}
 $("mapCap").onclick=()=>{mapCap=!mapCap;$("mapCap").setAttribute("aria-pressed",mapCap);renderMap();};
 $("mapOpen").onclick=()=>{openNowEl.checked=!openNowEl.checked;$("mapOpen").setAttribute("aria-pressed",openNowEl.checked);update();};
