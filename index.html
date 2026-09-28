@@ -745,7 +745,7 @@ let homeMode=store.get("datebars-mode","night");if(homeMode!=="day")homeMode="ni
 let planMode=store.get("datebars-planmode","night");if(planMode!=="day")planMode="night";
 const occHome={night:"all",day:"all"},occPlan={night:"all",day:"all"};
 let mode=homeMode,occasion="all",pickedPlan=null,lastPickedPlan=null;
-let slots=store.get("datebars-slots",[]).filter(k=>SLOTS[k]);
+let slots=store.get("datebars-slots",[]);
 let endPt=store.get("datebars-end",null),endLabel=store.get("datebars-end-label","")||"";const hasEnd=()=>Array.isArray(endPt)&&endPt.length===2;
 let profile=store.get("datebars-profile",null);const prof=k=>profile?profile[k]:undefined;
 let personalized=store.get("datebars-personalized",true);
@@ -793,6 +793,7 @@ const SLOTS={
   boat:{label:"On the water",match:r=>r.cat==="Boat"},
   dispensary:{label:"Dispensary",match:r=>r.cat==="Dispensary"}};
 const SLOTKEYS=Object.keys(SLOTS);
+slots=Array.isArray(slots)?slots.filter(k=>SLOTS[k]):[];
 const seqSlots=()=>slots;
 
 // ---------- controls ----------
@@ -1242,7 +1243,7 @@ function renderSettings(){const el=$("settings");const P=profile||{};const lbl=(
     ${row("pdrink","Partner drinking",lbl("drink",(P.partner||{}).drink),"p:drink")}
     ${row("pcannabis","Partner cannabis",lbl("cannabis",(P.partner||{}).cannabis),"p:cannabis")}
     ${row("pdiet","Partner food",lbl("diet",(P.partner||{}).diet),"p:diet")}
-    <div class="setrow"><div><div class="k">Connect their account</div><div class="v">Coming with accounts. For now, add their preferences above.</div></div></div>`:"";
+    <div class="setrow"><div><div class="k">Connect their account</div><div class="v">Coming with accounts. For now, add their preferences above.</div></div></div>`:`<div class="grp">Your partner</div><div class="setrow"><div><div class="k">Partner preferences</div><div class="v">${P.status==="single"?"Available when your status isn't single.":"Set your relationship status above to add a partner."}</div></div></div>`;
   el.innerHTML=`<div class="shead" id="shead"><h3>Settings</h3><span class="chev">›</span></div><div class="body"><p class="sub">Everything here stays on this phone.</p>
     <div class="grp">You</div>
     ${row("status","Relationship status",STATUS_L[P.status]||"Not set",idx("status"))}
