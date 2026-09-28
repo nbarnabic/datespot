@@ -37,7 +37,6 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{scroll-padding-top:0}
-html,body{overflow-x:hidden;max-width:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Fraunces",Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 button{font-family:inherit}
 input,select,textarea{font-size:16px}
@@ -247,6 +246,9 @@ body.scrolled .modeseg{display:none}
 @media (min-width:900px){.settings{margin:34px 0 0;max-width:720px}.tuned{padding:12px 0 0}.anniv{margin:14px 0 0;max-width:720px}}
 /* ---- map tab */
 #view-map{display:flex;flex-direction:column;height:calc(100dvh - var(--tabh));padding-bottom:0;min-height:0}
+.mapgrid{display:flex;flex-direction:column;flex:1;min-height:0}
+.mapslot{order:-1;flex:none}
+.mapleft{display:flex;flex-direction:column;flex:1;min-height:0}
 .mappanel{position:relative;height:330px;flex:none;margin:0 12px;border-radius:22px;overflow:hidden;background:var(--water);isolation:isolate;z-index:0}
 #map{position:absolute;inset:0;background:var(--water)}
 .mapchips{position:absolute;left:12px;top:12px;display:flex;gap:6px;z-index:1000}
