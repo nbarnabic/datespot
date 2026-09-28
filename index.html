@@ -246,16 +246,22 @@ body.scrolled .modeseg{display:none}
 @media (min-width:900px){.settings{margin:34px 0 0;max-width:720px}.tuned{padding:12px 0 0}.anniv{margin:14px 0 0;max-width:720px}}
 /* ---- map tab */
 #view-map{display:flex;flex-direction:column;height:calc(100dvh - var(--tabh));padding-bottom:0;min-height:0}
-.mapgrid{display:flex;flex-direction:column;flex:1;min-height:0}
-.mapslot{order:-1;flex:none}
-.mapleft{display:flex;flex-direction:column;flex:1;min-height:0}
-.mappanel{position:relative;height:330px;flex:none;margin:0 12px;border-radius:22px;overflow:hidden;background:var(--water);isolation:isolate;z-index:0}
+#view-map{position:relative;overflow:hidden}
+.mapgrid{position:absolute;inset:0}
+.mapslot{position:absolute;inset:0}
+.mapleft{position:absolute;left:0;right:0;bottom:0;max-height:52%;display:flex;flex-direction:column;background:var(--card);border-radius:22px 22px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.35);transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),visibility .28s;z-index:1100}
+.mapleft.up{transform:none;visibility:visible}
+.sheethandle{display:block;width:44px;height:5px;border-radius:999px;background:var(--line);margin:10px auto 0;border:0;padding:0;cursor:pointer;flex:none}
+.maplisttop{display:flex;justify-content:space-between;align-items:baseline;gap:10px;min-width:0}
+.maplisttop b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sheetclose{border:0;background:var(--chip);color:var(--ink);width:32px;height:32px;border-radius:999px;font-size:20px;line-height:1;cursor:pointer;flex:none;align-self:center}
+.mappanel{position:relative;height:100%;margin:0;overflow:hidden;background:var(--water);isolation:isolate;z-index:0}
 #map{position:absolute;inset:0;background:var(--water)}
-.mapchips{position:absolute;left:12px;top:12px;display:flex;gap:6px;z-index:1000}
+.mapchips{position:absolute;left:12px;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;gap:6px;z-index:1000}
 .mapchips button{border:0;border-radius:999px;padding:7px 12px;font-size:13px;background:rgba(15,15,16,.9);color:#f1ece4;cursor:pointer;font-family:inherit}
 .mapchips button[aria-pressed="true"]{background:#e0834a;color:#0f0f10}
-.locbtn{position:absolute;right:12px;top:12px;z-index:1000;width:40px;height:40px;border-radius:999px;border:0;background:rgba(15,15,16,.9);color:#f1ece4;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.maplisthdr{padding:16px 22px 6px;display:flex;justify-content:space-between;align-items:baseline;flex:none}
+.locbtn{position:absolute;right:12px;top:calc(env(safe-area-inset-top,0px) + 12px);z-index:1000;width:40px;height:40px;border-radius:999px;border:0;background:rgba(15,15,16,.9);color:#f1ece4;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.maplisthdr{padding:0 18px 8px;display:flex;flex-direction:column;gap:8px;flex:none}
 .maplisthdr b{font-size:18px;font-weight:600}
 .maplisthdr span{font-size:13px;color:var(--muted)}
 .maplist{flex:1;overflow-y:auto;min-height:0;padding-bottom:20px}
@@ -461,9 +467,14 @@ body.locked .tabs,body.locked .view{visibility:hidden}
   .suggestrow{margin:26px 0 0}
   /* map tab */
   #view-map{height:100vh;padding:0}
-  .mapgrid{display:grid;grid-template-columns:360px minmax(0,1fr);height:100vh}
-  .mapleft{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
-  .maplisthdr{padding:24px 22px 10px;flex-direction:column;align-items:flex-start;gap:4px}
+  #view-map{overflow:visible}
+  .mapgrid{position:static;display:grid;grid-template-columns:360px minmax(0,1fr);height:100vh}
+  .mapslot{position:static}
+  .mapleft{position:static;max-height:none;transform:none;visibility:visible;transition:none;background:none;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
+  .mobonly{display:none!important}
+  .maplisthdr{padding:24px 22px 10px;gap:4px}
+  .maplisttop{flex-direction:column;align-items:flex-start;gap:4px}
+  .maplisttop b{white-space:normal}
   .maplisthdr b{font-size:22px}
   .maplist{padding:0 12px 20px}
   .mrow{margin:0;padding:12px 10px;border-radius:12px;border-bottom:0}
@@ -602,14 +613,14 @@ body.locked .tabs,body.locked .view{visibility:hidden}
 <!-- ============ MAP ============ -->
 <div id="view-map" class="view safe" hidden>
 <div class="mapgrid">
-<div class="mapleft">
-  <div class="maplisthdr"><b id="mapListTitle">Closest to you</b><button class="origin" type="button" data-origin="1" style="font-size:13px"><span class="fromword">from </span><span class="originlbl"></span></button></div>
+<div class="mapleft" id="mapSheet">
+  <div class="maplisthdr"><button class="sheethandle mobonly" id="mapListHide" type="button" aria-label="Hide list"></button><div class="maplisttop"><b id="mapListTitle">Closest to you</b><button class="origin" type="button" data-origin="1" style="font-size:13px"><span class="fromword">from </span><span class="originlbl"></span></button><button class="sheetclose mobonly" id="mapListClose" type="button" aria-label="Hide list">×</button></div></div>
   <div class="maplist noscroll" id="maplist"></div>
 </div>
 <div class="mapslot" id="mapSlot">
   <div class="mappanel" id="mappanel">
     <div id="map" aria-label="Map of bars"></div>
-    <div class="mapchips"><button type="button" id="mapOcc">All</button><button type="button" id="mapCap" aria-pressed="false">≤ 20 min</button><button type="button" id="mapOpen" aria-pressed="false" class="deskonly">Open now</button></div>
+    <div class="mapchips"><button type="button" id="mapOcc">All</button><button type="button" id="mapCap" aria-pressed="false">≤ 20 min</button><button type="button" id="mapOpen" aria-pressed="false" class="deskonly">Open now</button><button type="button" id="mapListBtn" class="mobonly" aria-pressed="false">List</button></div>
     <div class="mapprev deskonly" id="mapPreview" hidden></div>
     <button class="locbtn" id="locate" type="button" aria-label="Use my location"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path><circle cx="12" cy="12" r="5"></circle></svg></button>
   </div>
@@ -719,7 +730,7 @@ async function decrypt(pass){
   const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(ENC.iv)},k,b64(ENC.ct));
   return JSON.parse(new TextDecoder().decode(pt));
 }
-const BUILD="2026-09-28.1010";
+const BUILD="2026-09-28.1130";
 function start(B){
 // row: hood, name, where, why, score, cost, (unused), (unused), food, lat, lng, res, closed, feats, status, url, resvUrl, cuisines, id, hours, kitchenClose
 const $=id=>document.getElementById(id);
@@ -1114,7 +1125,7 @@ function layout(){const desk=isDesktop();
 let lastW=window.innerWidth,rsT=null;window.addEventListener("resize",()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(window.innerWidth===lastW)return;lastW=window.innerWidth;layout();renderHome();},150);});
 function setHl(id,scroll){if(hlId===id&&!scroll)return;const changed=hlId!==id;hlId=id;if(changed&&map&&isDesktop()&&map.getZoom()<14){renderMap();}document.querySelectorAll("article.bar").forEach(a=>a.classList.toggle("hl",a.dataset.id===id));document.querySelectorAll(".mrow").forEach(a=>a.classList.toggle("hl",a.dataset.id===id));document.querySelectorAll(".pin[data-detail]").forEach(p=>p.classList.toggle("hl",p.dataset.detail===id));
   const r=byId.get(id);const pv=$("mapPreview");if(r&&isDesktop()){pv.hidden=false;pv.innerHTML=`<div style="flex:1;min-width:0"><div class="nm">${r.name}</div><div class="sm">${dot(r.hood,distTxt(r),r.kind==="bar"?book(r):r.type)}</div></div><a href="${dirUrl(r)}" target="_blank" rel="noopener">Directions</a>`;}else pv.hidden=true;
-  if(scroll){const el=document.querySelector(`article.bar[data-id="${id}"],.mrow[data-id="${id}"]`);if(el)el.scrollIntoView({block:"center",behavior:"smooth"});}}
+  if(scroll){const el=document.querySelector(`article.bar[data-id="${id}"],.mrow[data-id="${id}"]`);if(el&&(isDesktop()||!el.closest("#mapSheet")||$("mapSheet").classList.contains("up")))el.scrollIntoView({block:"center",behavior:"smooth"});}}
 // ---------- tabs ----------
 const VIEWS=["short","plan","home","tonight","map"];let view="home";
 function showView(v){view=v;VIEWS.forEach(x=>{$("view-"+x).hidden=x!==v;$("tab-"+x).setAttribute("aria-current",x===v?"page":"false");});store.set("datebars-tab",v);window.scrollTo(0,0);layout();if(v==="map")openMap();if(map)renderMap();}
@@ -1153,17 +1164,24 @@ async function openMap(){
     L.control.zoom({position:"bottomright",zoomInTitle:"Zoom in",zoomOutTitle:"Zoom out"}).addTo(map);
     map.attributionControl.setPrefix(false).addAttribution('Map data &copy; OpenStreetMap contributors, NYC Open Data');
     cv=L.canvas({padding:.5});
-    map.setMaxBounds(L.latLngBounds(G.land.flat()).pad(.1));
+    map.setMaxBounds(FOOT);clampZoom();
     fitAll();
     buildBase();
     pinLayer=L.layerGroup().addTo(map);planLayer=L.layerGroup().addTo(map);
     renderMap();
-    setTimeout(()=>{map.invalidateSize();fitAll();},60);
-  }else setTimeout(()=>map.invalidateSize(),60);
+    setTimeout(()=>{map.invalidateSize();clampZoom();fitAll();},60);
+  }else setTimeout(()=>{map.invalidateSize();clampZoom();},60);
 }
-const CORE=[[40.68,-74.05],[40.83,-73.90]];
+const CORE=[[40.68,-74.05],[40.83,-73.90]];const FOOT=[[40.635,-74.085],[40.895,-73.845]];
+function clampZoom(){if(!map)return;const s=map.getSize();if(!s.x||!s.y)return;const z=Math.max(9.5,Math.ceil(map.getBoundsZoom(L.latLngBounds(FOOT),true)*4)/4);map.setMinZoom(z);if(map.getZoom()<z)map.setZoom(z);}
 function fitAll(){if(!map)return;map.fitBounds(L.latLngBounds(CORE),{padding:[16,16]});}
-function fitHood(h){const pts=ALL.filter(r=>h==="All"||r.hood===h).map(r=>r.pt);if(pts.length)map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:16});}
+function fitHood(h){const pts=ALL.filter(r=>h==="All"||r.hood===h).map(r=>r.pt);if(!pts.length)return;const b=L.latLngBounds(pts);const s=map.getSize();if(isDesktop()||s.y<400)map.fitBounds(b,{padding:[30,30],maxZoom:16});else map.fitBounds(b,{paddingTopLeft:[30,90],paddingBottomRight:[30,Math.round(s.y*.52)+24],maxZoom:16});}
+let mapHoodSel=null;
+function openMapList(){paintMapList();$("mapSheet").classList.add("up");$("mapListBtn").setAttribute("aria-pressed","true");}
+function closeMapList(){$("mapSheet").classList.remove("up");$("mapListBtn").setAttribute("aria-pressed","false");mapHoodSel=null;paintMapList();}
+$("mapListBtn").addEventListener("click",()=>{if($("mapSheet").classList.contains("up"))closeMapList();else{mapHoodSel=null;openMapList();}});
+$("mapListClose").addEventListener("click",closeMapList);$("mapListHide").addEventListener("click",closeMapList);
+{let y0=null;const hdr=document.querySelector("#mapSheet .maplisthdr");hdr.addEventListener("touchstart",e=>{y0=e.touches[0].clientY;},{passive:true});hdr.addEventListener("touchend",e=>{if(y0!==null&&e.changedTouches[0].clientY-y0>40)closeMapList();y0=null;},{passive:true});}
 $("mapCap").onclick=()=>{mapCap=!mapCap;$("mapCap").setAttribute("aria-pressed",mapCap);renderMap();};
 $("mapOpen").onclick=()=>{openNowEl.checked=!openNowEl.checked;$("mapOpen").setAttribute("aria-pressed",openNowEl.checked);update();};
 $("mapOcc").onclick=()=>{showView("home");};
@@ -1176,10 +1194,10 @@ function renderMap(){
   const z=map.getZoom();
   if(z<(isDesktop()?14:13.75)){ // clusters by neighborhood
     const g={};rows.forEach(r=>(g[r.hood]=g[r.hood]||[]).push(r));
-    Object.keys(g).forEach(h=>{const pts=g[h].map(r=>r.pt);const c=[pts.reduce((a,p)=>a+p[0],0)/pts.length,pts.reduce((a,p)=>a+p[1],0)/pts.length];L.marker(c,{icon:L.divIcon({className:"",html:`<span class="cluster${pts.length>=15?" big":""}" title="${esc(h)}"><b>${pts.length}</b>${z>=12.5?`<small>${esc(h)}</small>`:""}</span>`,iconSize:null}),keyboard:false,zIndexOffset:pts.length}).on("click",()=>{fitHood(h);}).addTo(pinLayer);});
+    Object.keys(g).forEach(h=>{const pts=g[h].map(r=>r.pt);const c=[pts.reduce((a,p)=>a+p[0],0)/pts.length,pts.reduce((a,p)=>a+p[1],0)/pts.length];L.marker(c,{icon:L.divIcon({className:"",html:`<span class="cluster${pts.length>=15?" big":""}" title="${esc(h)}"><b>${pts.length}</b>${z>=12.5?`<small>${esc(h)}</small>`:""}</span>`,iconSize:null}),keyboard:false,zIndexOffset:pts.length}).on("click",()=>{if(isDesktop())fitHood(h);else{mapHoodSel=h;fitHood(h);openMapList();}}).addTo(pinLayer);});
     const hr=isDesktop()&&hlId&&rows.find(r=>r.id===hlId);if(hr){const i=rows.indexOf(hr);L.marker(hr.pt,{icon:L.divIcon({className:"",html:`<span class="pin hl" data-detail="${hr.id}">${i+1}</span>`,iconSize:null}),zIndexOffset:2000,keyboard:false}).on("click",()=>setHl(hr.id,true)).addTo(pinLayer);}
   }else{
-    rows.forEach((r,i)=>{const mk=L.marker(r.pt,{icon:L.divIcon({className:"",html:`<span class="pin${i<3&&!isDesktop()?" top":""}${hlId===r.id?" hl":""}" data-detail="${r.id}">${i+1}</span>`,iconSize:null}),zIndexOffset:hlId===r.id?900:(i<3?500:0),keyboard:false});mk.on("click",()=>{setHl(r.id,true);});mk.on("mouseover",()=>{if(isDesktop()&&hlId!==r.id)setHl(r.id,true);});mk.addTo(pinLayer);});
+    const prow=(!isDesktop()&&mapHoodSel)?rows.filter(r=>r.hood===mapHoodSel):rows;prow.forEach((r,i)=>{const mk=L.marker(r.pt,{icon:L.divIcon({className:"",html:`<span class="pin${i<3&&!isDesktop()?" top":""}${hlId===r.id?" hl":""}" data-detail="${r.id}">${i+1}</span>`,iconSize:null}),zIndexOffset:hlId===r.id?900:(i<3?500:0),keyboard:false});mk.on("click",()=>{setHl(r.id,true);});mk.on("mouseover",()=>{if(isDesktop()&&hlId!==r.id)setHl(r.id,true);});mk.addTo(pinLayer);});
   }
   const stops=plan.map(id=>byId.get(id)).filter(Boolean);
   if(stops.length>1)L.polyline(stops.map(r=>r.pt),{renderer:cv,interactive:false,color:cssVar("--rose"),weight:2.5,opacity:.9,dashArray:"6 6"}).addTo(planLayer);
@@ -1187,8 +1205,9 @@ function renderMap(){
 }
 $("maplist").addEventListener("mouseover",e=>{const row=e.target.closest(".mrow");if(row&&isDesktop()&&row.dataset.id!==hlId)setHl(row.dataset.id,false);});
 function paintMapList(){
-  const rows=mapRows;
-  $("maplist").innerHTML=rows.length?rows.map((r,i)=>`<div class="mrow${hlId===r.id?" hl":""}" data-id="${r.id}" onmouseenter=""><span class="rank" style="${i<3?"border-color:var(--rose);color:var(--rose)":""}">${i+1}</span><div style="flex:1;min-width:0"><div class="nm">${r.name}</div><div class="sm">${r.hood} · <b>${hearts(r.score)}</b></div></div>${hasOrigin()?`<span class="d">${r.tr.min} min<small>${r.tr.mode}</small></span>`:`<span class="d">${"$".repeat(r.cost)}</span>`}</div>`).join(""):'<div class="empty">Nothing matches here. Loosen a filter or turn off ≤ 20 min.</div>';
+  const sel=!isDesktop()&&mapHoodSel;const rows=sel?mapRows.filter(r=>r.hood===sel):mapRows;
+  if(sel)$("mapListTitle").textContent=sel+" · "+rows.length+(rows.length===1?" place":" places");
+  $("maplist").innerHTML=rows.length?rows.map((r,k)=>{const i=sel?k:mapRows.indexOf(r);return `<div class="mrow${hlId===r.id?" hl":""}" data-id="${r.id}" onmouseenter=""><span class="rank" style="${i<3?"border-color:var(--rose);color:var(--rose)":""}">${i+1}</span><div style="flex:1;min-width:0"><div class="nm">${r.name}</div><div class="sm">${r.hood} · <b>${hearts(r.score)}</b></div></div>${hasOrigin()?`<span class="d">${r.tr.min} min<small>${r.tr.mode}</small></span>`:`<span class="d">${"$".repeat(r.cost)}</span>`}</div>`;}).join(""):'<div class="empty">Nothing matches here. Loosen a filter or turn off ≤ 20 min.</div>';
 }
 darkMq.addEventListener("change",()=>{if(map){location.reload();}});
 
