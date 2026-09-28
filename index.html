@@ -143,6 +143,9 @@ body.scrolled .modeseg{display:none}
 .stop .when{flex:none;text-align:right;font-size:14px;color:var(--ink)}
 .stop .when small{display:block;font-size:11px;color:var(--muted)}
 .stop .warn{font-size:12px;color:var(--rose);margin-top:2px}
+.stop{align-items:flex-start;cursor:pointer}
+.stop .when{margin-top:2px}
+.stop .dacts .act{padding:5px 11px;font-size:13px}
 .ideas{margin:0 20px;padding-top:6px}
 .ideas .srow{margin:0}
 .tn-sub{padding:6px 22px 0;font-size:14px;color:var(--muted)}
@@ -215,7 +218,13 @@ body.scrolled .modeseg{display:none}
 .chip[aria-pressed="true"]{background:var(--chip-on);color:var(--chip-on-ink)}
 .suggestrow{margin:26px 20px 0;padding-top:16px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted)}
 .settings{margin:30px 20px 0;padding-top:18px;border-top:1px solid var(--line)}
-.settings h3{margin:0 0 4px;font-size:22px;font-weight:600}
+.settings h3{margin:0;font-size:22px;font-weight:600}
+.settings .shead{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:4px 0}
+.settings .shead .chev{color:var(--muted);font-size:20px;transition:transform .15s}
+.settings.open .shead .chev{transform:rotate(90deg)}
+.settings .body{display:none}
+.settings.open .body{display:block}
+.partner{margin-top:8px}
 .settings .sub{margin:0 0 12px}
 .setrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .setrow .k{font-size:14px;color:var(--muted)}
@@ -277,7 +286,7 @@ body.scrolled .modeseg{display:none}
 .tabs button{border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;transition:color .15s}
 .tabs button svg{width:22px;height:22px}
 .tabs button[aria-current="page"]{color:var(--rose)}
-.tabs button span{white-space:nowrap}
+.tabs button span{white-space:nowrap;font-size:10px}
 body.locked .tabs,body.locked .view{visibility:hidden}
 /* ---- sheets */
 .sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:5000;display:flex;align-items:flex-end;justify-content:center}
@@ -559,9 +568,12 @@ body.locked .tabs,body.locked .view{visibility:hidden}
 
 <!-- ============ SHORTLIST ============ -->
 <div id="view-short" class="view safe" hidden>
-  <div class="shhead"><div style="padding:10px 20px 0"><div class="wm">Short<em>list</em></div><div class="sub" id="shortSub"></div></div>
+  <div class="shhead"><div style="padding:10px 20px 0"><div class="wm">Short<em>list</em> &amp; Settings</div><div class="sub" id="shortSub"></div></div>
   <div class="seg" role="group" aria-label="Sort shortlist"><button type="button" id="shNear" aria-pressed="true">Nearest first</button><button type="button" id="shBest" aria-pressed="false">Highest rated</button></div></div>
-  <div id="shortlist" style="margin-top:10px"></div>
+  <div class="eb2" id="favEb">Favorites</div>
+  <div id="shortlist" style="margin-top:0"></div>
+  <div class="eb2" id="beenEb">Been there</div>
+  <div id="beenlist"></div>
   <div class="suggestrow"><button class="chip" id="suggestBtn" type="button">Suggest a spot</button><span>Know somewhere that belongs here? Send it in.</span></div>
   <div class="settings" id="settings"></div>
 </div>
@@ -603,7 +615,7 @@ body.locked .tabs,body.locked .view{visibility:hidden}
 
 <nav class="tabs" aria-label="Sections">
   <div class="sidewm deskonly">Date <em>Spot</em></div>
-  <button type="button" id="tab-short" aria-current="false"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3 1.6-1.8 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z" fill="currentColor"></path></svg><span>Shortlist <b id="tabShortN"></b></span></button>
+  <button type="button" id="tab-short" aria-current="false"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3 1.6-1.8 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z" fill="currentColor"></path></svg><span>Shortlist &amp; Settings <b id="tabShortN"></b></span></button>
   <button type="button" id="tab-plan" aria-current="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"></rect><circle cx="9" cy="9" r="1.3" fill="currentColor"></circle><circle cx="15" cy="15" r="1.3" fill="currentColor"></circle><circle cx="15" cy="9" r="1.3" fill="currentColor"></circle><circle cx="9" cy="15" r="1.3" fill="currentColor"></circle></svg><span>Plan</span></button>
   <button type="button" id="tab-home" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z" fill="currentColor"></path></svg><span>Home</span></button>
   <button type="button" id="tab-tonight" aria-current="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path><path d="M12 18.2s-3-1.9-3-3.8a1.5 1.5 0 0 1 3-.6 1.5 1.5 0 0 1 3 .6c0 1.9-3 3.8-3 3.8z" fill="currentColor" stroke="none"></path></svg><span>Date</span></button>
@@ -735,6 +747,8 @@ function dayOptions(sel){const today=new Date().getDay();sel.innerHTML="";const 
 function setPlanDay(v){if(v==="today"){planDay=new Date().getDay();planTomorrow=false;}else if(v==="tomorrow"){planDay=(new Date().getDay()+1)%7;planTomorrow=true;}else{planDay=+v;planTomorrow=false;}document.querySelectorAll("#planDay,#planDay2").forEach(x=>x.value=v);update();}
 function planDayLabel(){const v=$("planDay").value;return v==="today"?"tonight":v==="tomorrow"?"tomorrow":DAYN2[planDay];}
 let picks=new Set(store.get("datebars-picks",[]).map(x=>byName.get(x)||x).filter(x=>byId.has(x)));
+let been=new Set(store.get("datebars-been",[]).filter(x=>byId.has(x)));const saveBeen=()=>store.set("datebars-been",[...been]);
+let settingsOpen=store.get("datebars-settings-open",false);
 let notes=store.get("datebars-notes",{})||{};
 let plan=store.get("datebars-plan",[]).filter(x=>byId.has(x));
 const savePicks=()=>store.set("datebars-picks",[...picks]),saveNotes=()=>store.set("datebars-notes",notes),savePlan=()=>store.set("datebars-plan",plan);
@@ -797,7 +811,10 @@ $("dirApple").onclick=()=>{dirApp="apple";store.set("datebars-dir",dirApp);paint
 $("dirGoogle").onclick=()=>{dirApp="google";store.set("datebars-dir",dirApp);paintDir();update();};
 paintDir();
 // occasion chips + tiles
-const soberOk=()=>!!(prof("drink")&&prof("drink")!=="drink");
+const pp=k=>profile&&profile.partner?profile.partner[k]:undefined;
+const soberOk=()=>!!((prof("drink")&&prof("drink")!=="drink")||(pp("drink")&&pp("drink")!=="drink"));
+const cannabisOk=()=>prof("cannabis")==="yes"&&(pp("cannabis")===undefined||pp("cannabis")==="yes");
+const dietAll=()=>[...(prof("diet")||[]),...(pp("diet")||[])];
 function buildOcc(){$("occrow").innerHTML="";OCCOF(homeMode).forEach(([k,l])=>{if(k==="sober"&&!soberOk())return;const b=document.createElement("button");b.className="occ";b.type="button";b.dataset.occ=k;b.textContent=l;$("occrow").appendChild(b);});
   $("tiles").innerHTML="";OCCOF(planMode).forEach(([k,l])=>{if(k==="sober"&&!soberOk())return;const t=document.createElement("button");t.className="tile";t.type="button";t.dataset.occ=k;t.innerHTML=`<span class="l">${l}</span><span class="n" data-n="${k}"></span>`;$("tiles").appendChild(t);});}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-occ]");if(!b)return;if(b.closest("#view-plan"))occPlan[planMode]=b.dataset.occ;else occHome[homeMode]=b.dataset.occ;update();});
@@ -867,7 +884,7 @@ function closedTxt(r){if(!r.closed)return "";const days=r.closed.split(",").map(
 
 // ---------- filtering ----------
 function baseRows(){ // manual filters (sheet + search), no occasion, no sort
-  let rows=ALL.filter(r=>(homeMode==="day"?r.kind==="place":r.kind==="bar")&&(r.cat!=="Dispensary"||prof("cannabis")==="yes"||catOn.has("Dispensary")));const now=new Date();
+  let rows=ALL.filter(r=>(homeMode==="day"?r.kind==="place":r.kind==="bar")&&(r.cat!=="Dispensary"||cannabisOk()||catOn.has("Dispensary")));const now=new Date();
   const q=qEl.value.trim().toLowerCase();
   if(q)rows=rows.filter(r=>(r.name+" "+r.hood+" "+r.where+" "+r.why+" "+r.food+" "+r.feats.join(" ")+" "+r.cuis.join(" ")).toLowerCase().includes(q));
   if(hood!=="All")rows=rows.filter(r=>r.hood===hood);
@@ -887,11 +904,11 @@ function baseRows(){ // manual filters (sheet + search), no occasion, no sort
   return rows;
 }
 function occRows(rows,k){const P=OCCDEF[k];if(!P)return rows;return rows.filter(r=>(!P.feats||P.feats.every(f=>r.feats.includes(f)))&&(!P.four||r.score>=4)&&(!P.price||P.price.includes(r.cost))&&(!P.ftype||r.type===P.ftype)&&(P.resv!=="yes"||r.res.startsWith("reservations"))&&(P.resv!=="walk"||r.res.startsWith("walk-in"))&&(!P.zp||P.zp.includes(r.zp))&&(!P.cats||P.cats.includes(r.cat))&&(!(P.featsAny||P.catsOr)||(P.featsAny||[]).some(f=>r.feats.includes(f))||(P.catsOr||[]).includes(r.cat)));}
-const sinkDrinks=()=>personalized&&prof("drink")&&prof("drink")!=="drink";
+const sinkDrinks=()=>personalized&&soberOk();
 function sortRows(rows,s){const order=["Drinks only","Snacks & small plates","Bar food","Full meal","Unknown"];if(!hasOrigin()&&s==="dist")s="score";const tm=r=>r.tr.min==null?0:r.tr.min;const sk=r=>sinkDrinks()&&r.kind==="bar"&&r.type==="Drinks only"&&r.zp!=="strong"?1:0;return rows.slice().sort((a,b)=>s==="score"?(sk(a)-sk(b)||b.score-a.score||tm(a)-tm(b)):s==="dist"?(tm(a)-tm(b)||b.score-a.score):s==="type"?(order.indexOf(a.type)-order.indexOf(b.type)||b.score-a.score):(a.cost-b.cost||b.score-a.score));}
 function filtered(){return sortRows(occRows(baseRows(),occHome[homeMode]),sortEl.value);}
 // Plan has its own pool: nothing from Home's search or filter sheet leaks in
-function planBase(){return ALL.filter(r=>(planMode==="day"?r.kind==="place":r.kind==="bar")&&(r.cat!=="Dispensary"||prof("cannabis")==="yes")&&r.status!=="closed"&&r.status!=="unverified"&&!closedOnDay(r,planDay));}
+function planBase(){return ALL.filter(r=>(planMode==="day"?r.kind==="place":r.kind==="bar")&&(r.cat!=="Dispensary"||cannabisOk())&&r.status!=="closed"&&r.status!=="unverified"&&!closedOnDay(r,planDay));}
 function planRows(){return sortRows(occRows(planBase(),occPlan[planMode]),"score");}
 function groupKey(r,s){if(!hasOrigin()&&s==="dist")s="score";if(s==="score")return hearts(r.score)+" "+r.score+(r.score===1?" heart":" hearts");if(s==="type")return r.type;if(s==="cheap")return "$".repeat(r.cost);const m=r.tr.min;return m<10?"Under 10 min":m<20?"10 to 20 min":m<30?"20 to 30 min":"Over 30 min";}
 
@@ -902,7 +919,7 @@ function card(r,idx){
   const d=document.createElement("article");d.className="bar"+(r.status==="closed"?" closed":"")+(hlId===r.id?" hl":"");d.dataset.id=r.id;d.setAttribute("role","button");d.tabIndex=0;
   d.onmouseenter=()=>{if(isDesktop())setHl(r.id,false);};
   const note=notes[r.id];
-  const badges=[r.zp==="strong"?"zero-proof ✓":r.zp==="some"?"NA options":"",r.kind==="bar"&&r.cuis.includes("Vegan / veggie")&&(prof("diet")||[]).some(x=>/veg/.test(x))?"veg-friendly":""].filter(Boolean);
+  const badges=[r.zp==="strong"?"zero-proof ✓":r.zp==="some"?"NA options":"",r.kind==="bar"&&r.cuis.includes("Vegan / veggie")&&dietAll().some(x=>/veg/.test(x))?"veg-friendly":""].filter(Boolean);
   d.innerHTML=`${idx!=null?`<span class="rank">${idx+1}</span>`:""}<div class="top"><div><h2 class="name">${r.name}<span class="inlh deskonly">${hearts(r.score)}</span>${r.status?`<span class="tag ${r.status}">${r.status}</span>`:""}</h2><div class="meta">${r.hood} · ${r.cost===1&&r.kind==="place"?"free or cheap":"$".repeat(r.cost)} · ${r.type}</div></div>${heartBtn(r)}</div>
     <p class="desc">${r.why}</p>
     ${note?`<p class="note1">“${esc(note)}”</p>`:""}
@@ -913,7 +930,7 @@ function detailHtml(r){
   const note=notes[r.id]||"",now=new Date(),st=openState(r,now);
   return `<div class="dtop"><div><h2>${r.name}</h2><div class="dsub">${r.hood} · ${r.where}${r.status?` · <span class="tag ${r.status}">${r.status}</span>`:""}</div></div><div><span class="score ${r.score<4?"lo":""}">${hearts(r.score)}</span> <b>${"$".repeat(r.cost)}</b></div></div>
     <div class="dacts">${r.rurl?`<a class="act primary" href="${r.rurl}" target="_blank" rel="noopener">${r.kind==="place"?"Tickets":"Reserve"}</a>`:""}${r.url?`<a class="act" href="${r.url}" target="_blank" rel="noopener">Site</a>`:""}<a class="act" href="${appleUrl(r)}" target="_blank" rel="noopener">Apple Maps</a><a class="act" href="${gmapUrl(r)}" target="_blank" rel="noopener">Google Maps</a></div>
-    <div class="dacts"><button class="act" type="button" data-save="${r.id}" aria-pressed="${picks.has(r.id)}">${picks.has(r.id)?"Saved ♥":"Save ♡"}</button><button class="act" type="button" data-plan="${r.id}" aria-pressed="${plan.includes(r.id)}">${plan.includes(r.id)?"In the date ✓":"Add to date"}</button><button class="act" type="button" data-share="${r.id}">Share</button></div>
+    <div class="dacts"><button class="act" type="button" data-save="${r.id}" aria-pressed="${picks.has(r.id)}">${picks.has(r.id)?"Saved ♥":"Save ♡"}</button><button class="act" type="button" data-plan="${r.id}" aria-pressed="${plan.includes(r.id)}">${plan.includes(r.id)?"In the date ✓":"Add to date"}</button><button class="act" type="button" data-share="${r.id}">Share</button><button class="act" type="button" data-been="${r.id}" aria-pressed="${been.has(r.id)}">${been.has(r.id)?"Been ✓":"Been here"}</button></div>
     <p class="why">${r.why}</p>
     <p class="food"><span class="fl">${r.type}</span> ${r.food}</p>
     ${r.feats.length||r.cuis.length?`<div class="tags">${r.feats.map(f=>`<span>${f}</span>`).join("")}${r.cuis.map(c=>`<span class="cu">${c}</span>`).join("")}</div>`:""}
@@ -926,7 +943,7 @@ $("dclose").onclick=()=>{$("detail").hidden=true;detailId=null;};
 document.addEventListener("click",e=>{
   const db=e.target.closest("[data-detail]");if(db){openDetail(db.dataset.detail);return;}
   if(e.target.closest("a,button,textarea,input,select,.noteedit"))return;
-  const a=e.target.closest("article.bar,.rcard,.srow,.mrow,.pickbanner,.pickcard,.shrow .top");if(a&&a.dataset.id)openDetail(a.dataset.id);
+  const a=e.target.closest("article.bar,.rcard,.srow,.mrow,.pickbanner,.pickcard,.shrow .top,.stop");if(a&&a.dataset.id)openDetail(a.dataset.id);
 });
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches&&e.target.matches("article.bar"))openDetail(e.target.dataset.id);});
 
@@ -962,10 +979,13 @@ $("pickBtn2").onclick=()=>{seqSlots().length?autoPlan():pickOnePlan();};
 document.addEventListener("click",e=>{if(e.target.closest("[data-clearpick]")){picked=null;update();}});
 
 // ---------- plan tab ----------
-function slotRows(slotKey,near,arriveMin){const S=SLOTS[slotKey];if(!S)return [];let rows=ALL.filter(r=>S.match(r)&&r.status!=="closed"&&r.status!=="unverified"&&(r.cat!=="Dispensary"||prof("cannabis")==="yes")&&!closedOnDay(r,planDay));
+function slotRows(slotKey,near,arriveMin){const S=SLOTS[slotKey];if(!S)return [];let rows=ALL.filter(r=>S.match(r)&&r.status!=="closed"&&r.status!=="unverified"&&(r.cat!=="Dispensary"||cannabisOk())&&!closedOnDay(r,planDay));
   if(arriveMin!=null)rows=rows.filter(r=>{const h=hoursOn(r,planDay);if(!h)return true;return arriveMin>=h.o&&(h.c===null||arriveMin<h.c-30);});
   const walkCap=+(prof("maxwalk")||15);
   return rows.map(r=>({r,m:near?walkMin(near,r.pt):null})).filter(o=>o.m===null||o.m<=walkCap).sort((a,b)=>(a.m??0)-(b.m??0)||b.r.score-a.r.score).map(o=>o.r);}
+function planDate(){const now=new Date();const d=new Date(now.getFullYear(),now.getMonth(),now.getDate());while(d.getDay()!==planDay)d.setDate(d.getDate()+1);return d;}
+function showtimesUrl(r){const d=planDate();const ymd=d.toISOString().slice(0,10);if(r.tickets)return r.tickets;return "https://www.google.com/search?q="+encodeURIComponent(r.name+" showtimes "+ymd);}
+const isShow=r=>["Cinema","Music","Comedy","Theater"].includes(r.cat);
 function legTxt(min){const modes=prof("modes")||[];const cap=+(prof("maxwalk")||15);if(min>cap&&modes.includes("cab"))return min+" min walk, or a quick cab";if(min>cap&&modes.includes("subway"))return min+" min walk, or hop on the subway";return min+" min walk";}
 function autoPlan(){const slots=seqSlots();if(!slots.length){pickOnePlan();return;}const stops=[];let t=startAt;
   for(let i=0;i<slots.length;i++){const last=stops[stops.length-1];const near=last?last.pt:(hasOrigin()?origin:null);let cand=slotRows(slots[i],near,t).filter(r=>!stops.includes(r));
@@ -990,39 +1010,43 @@ function renderPlanTab(){
   let rows,title;
   if(slots.length&&stops.length<slots.length){const k=stops.length;const last=stops[stops.length-1];const it=itinerary();const arrive=it.length?it[it.length-1].arrive+it[it.length-1].dwell:startAt;rows=slotRows(slots[k],last?last.pt:(hasOrigin()?origin:null),arrive).filter(r=>!plan.includes(r.id));title="Stop "+(k+1)+": "+SLOTS[slots[k]].label+(last?" near "+last.name:"");}
   else{rows=planRows();title=occLabel(occPlan[planMode],planMode)+" "+planDayLabel();}
-  $("railTitle").textContent=title;$("seeAll").textContent=slots.length&&stops.length<slots.length?"":"See all "+rows.length;
+  $("railTitle").textContent=title;$("seeAll").textContent=rows.length>8?(planAll?"Show fewer":"See all "+rows.length):"";
   const k=stops.length;
-  $("rail").innerHTML=rows.slice(0,8).map(r=>`<div class="rcard" data-id="${r.id}"><div class="top"><span class="h">${hearts(r.score)}</span>${heartBtn(r,"")}</div><div class="nm">${r.name}</div><div class="sm">${dot(r.hood,"$".repeat(r.cost),r.type,distTxt(r))}</div><div class="ds">${r.why}</div><div class="acts2"><button class="act${plan.includes(r.id)?" primary":""}" type="button" data-plan="${r.id}" aria-pressed="${plan.includes(r.id)}">${plan.includes(r.id)?"In the date ✓":(slots.length?"Add as stop "+(k+1):"Add to date")}</button>${dirLink(r,"act","Directions")}</div></div>`).join("")||'<div class="empty">Nothing fits this slot nearby. Loosen a filter or plan it again.</div>';
+  $("rail").innerHTML=rows.slice(0,planAll?rows.length:8).map(r=>`<div class="rcard" data-id="${r.id}"><div class="top"><span class="h">${hearts(r.score)}</span>${heartBtn(r,"")}</div><div class="nm">${r.name}</div><div class="sm">${dot(r.hood,"$".repeat(r.cost),r.type,distTxt(r))}</div><div class="ds">${r.why}</div><div class="acts2"><button class="act${plan.includes(r.id)?" primary":""}" type="button" data-plan="${r.id}" aria-pressed="${plan.includes(r.id)}">${plan.includes(r.id)?"In the date ✓":(slots.length?"Add as stop "+(k+1):"Add to date")}</button>${dirLink(r,"act","Directions")}</div></div>`).join("")||'<div class="empty">Nothing fits this slot nearby. Loosen a filter or plan it again.</div>';
 }
 function saveSlots(){store.set("datebars-slots",slots);}
 function renderStops(){const el=$("stops");const stops=plan.map(id=>byId.get(id)).filter(Boolean);
-  el.innerHTML=slots.map((k,i)=>`<div class="stoprow"><span class="num">${i+1}</span><span class="pillsel"><select data-slotsel="${i}" aria-label="Stop ${i+1} type">${SLOTKEYS.filter(x=>x!=="dispensary"||prof("cannabis")==="yes").map(x=>`<option value="${x}" ${x===k?"selected":""}>${SLOTS[x].label}</option>`).join("")}</select></span>${stops[i]?`<span class="sm" style="font-size:13px;color:var(--muted);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${stops[i].name}</span>`:""}<button class="x" type="button" data-slotdel="${i}" aria-label="Remove stop ${i+1}">×</button></div>`).join("")
+  el.innerHTML=slots.map((k,i)=>`<div class="stoprow"><span class="num">${i+1}</span><span class="pillsel"><select data-slotsel="${i}" aria-label="Stop ${i+1} type">${SLOTKEYS.filter(x=>x!=="dispensary"||cannabisOk()).map(x=>`<option value="${x}" ${x===k?"selected":""}>${SLOTS[x].label}</option>`).join("")}</select></span>${stops[i]?`<span class="sm" style="font-size:13px;color:var(--muted);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${stops[i].name}</span>`:""}<button class="x" type="button" data-slotdel="${i}" aria-label="Remove stop ${i+1}">×</button></div>`).join("")
     +`<button class="addstop" type="button" id="addStop">+ Add a stop${slots.length?"":" to build a night"}</button>`+(slots.length?"":'<p class="hint">No stops set: Pick one for me chooses a single place. Add stops to plan a whole night, as many as you like.</p>');
   el.querySelectorAll("[data-slotsel]").forEach(sel=>sel.onchange=()=>{const i=+sel.dataset.slotsel;slots[i]=sel.value;saveSlots();if(plan.length>i){plan=plan.slice(0,i);savePlan();}update();});
   el.querySelectorAll("[data-slotdel]").forEach(b=>b.onclick=()=>{const i=+b.dataset.slotdel;slots.splice(i,1);saveSlots();if(plan.length>i){plan.splice(i,1);savePlan();}update();});
   el.querySelector("#addStop").onclick=()=>{const last=slots[slots.length-1];const next=!last?(planMode==="day"?"coffee":"drinks"):last==="drinks"?"dinner":last==="dinner"?"drinks":last==="coffee"?"walk":last==="walk"?"lunch":last==="show"?"drinks":"drinks";slots.push(next);saveSlots();update();};}
-$("seeAll").onclick=()=>showView("home");
+let planAll=false;$("seeAll").onclick=()=>{planAll=!planAll;renderPlanTab();};
 
 // ---------- shortlist tab ----------
 $("shNear").onclick=()=>{shSort="near";renderShort();};$("shBest").onclick=()=>{shSort="best";renderShort();};
-function renderShort(){
-  $("shNear").setAttribute("aria-pressed",shSort==="near");$("shBest").setAttribute("aria-pressed",shSort==="best");
-  const rows=ALL.filter(r=>picks.has(r.id)).sort((a,b)=>shSort==="near"?(a.tr.min-b.tr.min||b.score-a.score):(b.score-a.score||a.tr.min-b.tr.min));
-  $("shortSub").textContent=rows.length+" saved on this phone · notes are private";
-  $("tabShortN").textContent=rows.length?String(rows.length):"";
-  const el=$("shortlist");
-  if(!rows.length){el.innerHTML='<div class="empty">Nothing saved yet. Tap the heart on any place and it lands here.</div>';return;}
-  el.innerHTML=rows.map(r=>{const note=notes[r.id]||"";const warn=closedTxt(r);return `<div class="shrow" data-id="${r.id}">
+function shRow(r,which){const note=notes[r.id]||"";const warn=closedTxt(r);return `<div class="shrow" data-id="${r.id}">
     <div class="top" data-id="${r.id}"><div class="nm">${r.name}</div><span class="h">${hearts(r.score)}</span></div>
-    <div class="sm">${dot(r.hood,"$".repeat(r.cost),book(r),distTxt(r))}</div>
+    <div class="sm">${dot(r.hood,"$".repeat(r.cost),r.kind==="bar"?book(r):r.type,distTxt(r))}</div>
     ${warn?`<div class="warn">${warn}</div>`:""}
     <div class="notebox ${note?"":"empty"}" data-noteedit="${r.id}" role="button" tabindex="0">${note?esc(note):"Add a note"}</div>
-    <div class="acts">${dirLink(r,"btn","Directions")}${r.rurl?`<a class="btn rsv2" href="${r.rurl}" target="_blank" rel="noopener">Reserve</a>`:""}<button class="btn outline x" type="button" data-unsave="${r.id}" aria-label="Remove from shortlist">×</button></div></div>`;}).join("");
+    <div class="acts">${dirLink(r,"btn","Directions")}${r.rurl?`<a class="btn rsv2" href="${r.rurl}" target="_blank" rel="noopener">${r.kind==="place"?"Tickets":"Reserve"}</a>`:""}<button class="btn outline" type="button" data-been="${r.id}" aria-pressed="${been.has(r.id)}" style="flex:none;padding:0 12px">${been.has(r.id)?"Been ✓":"Been here"}</button><button class="btn outline x" type="button" data-${which==="been"?"unbeen":"unsave"}="${r.id}" aria-label="Remove">×</button></div></div>`;}
+function renderShort(){
+  $("shNear").setAttribute("aria-pressed",shSort==="near");$("shBest").setAttribute("aria-pressed",shSort==="best");
+  const srt=(a,b)=>shSort==="near"?((a.tr.min??0)-(b.tr.min??0)||b.score-a.score):(b.score-a.score||(a.tr.min??0)-(b.tr.min??0));
+  const rows=ALL.filter(r=>picks.has(r.id)).sort(srt),brows=ALL.filter(r=>been.has(r.id)).sort(srt);
+  $("shortSub").textContent=rows.length+" saved · "+brows.length+" been · notes are private";
+  $("tabShortN").textContent=rows.length?String(rows.length):"";
+  $("favEb").textContent="Favorites · "+rows.length;$("beenEb").textContent="Been there · "+brows.length;
+  $("shortlist").innerHTML=rows.length?rows.map(r=>shRow(r,"fav")).join(""):'<div class="empty">Nothing saved yet. Tap the heart on any place and it lands here.</div>';
+  $("beenlist").innerHTML=brows.length?brows.map(r=>shRow(r,"been")).join(""):'<div class="empty">Tap "Been here" on a place after you go, and it lands here.</div>';
 }
 document.addEventListener("click",e=>{
   const ne=e.target.closest("[data-noteedit]");if(ne){const id=ne.dataset.noteedit;const cur=notes[id]||"";const ed=document.createElement("div");ed.className="noteedit";ed.innerHTML=`<textarea rows="3" placeholder="Best table, what to order, who you went with…">${esc(cur)}</textarea><div class="row"><button class="chip small" type="button" data-notesave="${id}">Save note</button><button class="chip small" type="button" data-notecancel="1">Cancel</button></div>`;ne.replaceWith(ed);ed.querySelector("textarea").focus();return;}
   if(e.target.closest("[data-notecancel]")){renderShort();return;}
-  const us=e.target.closest("[data-unsave]");if(us){const id=us.dataset.unsave;picks.delete(id);savePicks();plan=plan.filter(x=>x!==id);savePlan();update();}
+  const us=e.target.closest("[data-unsave]");if(us){const id=us.dataset.unsave;picks.delete(id);savePicks();plan=plan.filter(x=>x!==id);savePlan();update();return;}
+  const ub=e.target.closest("[data-unbeen]");if(ub){been.delete(ub.dataset.unbeen);saveBeen();update();return;}
+  const bb=e.target.closest("[data-been]");if(bb){const id=bb.dataset.been;been.has(id)?been.delete(id):been.add(id);saveBeen();update();if(detailId)refreshDetail();return;}
 });
 
 // ---------- tonight tab ----------
@@ -1036,7 +1060,7 @@ function itinerary(){const stops=plan.map(id=>byId.get(id)).filter(Boolean);let 
 function renderTonight(){
   const it=itinerary();const pc=$("plancard");
   if(!it.length)pc.innerHTML='<div class="emptyp">No stops yet. Plan it on the Plan tab, or tap + on a saved place below.</div>';
-  else pc.innerHTML=it.map((x,i)=>(i?`<div class="gap"><i></i><span>${legTxt(x.walk)}</span></div>`:"")+`<div class="stop" data-id="${x.r.id}"><span class="num">${i+1}</span><div style="flex:1;min-width:0"><div class="nm">${x.r.name}</div><div class="sm">${x.r.hood} · ${x.r.type}${x.r.res.startsWith("reservations")?" · reserve":""}</div>${x.warn?`<div class="warn">${esc(x.warn)}</div>`:""}</div><span class="when">${clock(x.arrive)}<small>${x.dwell} min</small></span><button class="x" type="button" data-unplan="${x.r.id}" aria-label="Remove ${esc(x.r.name)}">×</button></div>`).join("")+(hasEnd()?`<div class="gap"><i></i><span>${walkMin(it[it.length-1].r.pt,endPt)} min walk to ${esc(endLabel)}</span></div>`:"")+`<div class="sm" style="font-size:13px;color:var(--muted);margin-top:12px">Wrap up around ${clock(it[it.length-1].arrive+it[it.length-1].dwell)}. Times assume ${it.map(x=>x.dwell).join("/")} min per stop.</div><a class="primary sm" href="${dirUrl(it[0].r)}" target="_blank" rel="noopener" style="text-decoration:none">Directions to stop 1</a>`;
+  else pc.innerHTML=it.map((x,i)=>(i?`<div class="gap"><i></i><span>${legTxt(x.walk)}</span></div>`:"")+`<div class="stop" data-id="${x.r.id}" role="button" tabindex="0"><span class="num">${i+1}</span><div style="flex:1;min-width:0"><div class="nm">${x.r.name}</div><div class="sm">${dot(x.r.hood,x.r.where,x.r.type)}</div><div class="sm" style="margin-top:2px">${x.r.why}</div>${x.warn?`<div class="warn">${esc(x.warn)}</div>`:""}<div class="dacts" style="margin-top:8px">${isShow(x.r)?`<a class="act primary" href="${showtimesUrl(x.r)}" target="_blank" rel="noopener">Showtimes ${esc(planDayLabel()==="tonight"?"today":planDayLabel())}</a>`:x.r.rurl?`<a class="act primary" href="${x.r.rurl}" target="_blank" rel="noopener">${x.r.kind==="place"?"Tickets":"Reserve"}</a>`:""}${dirLink(x.r,"act","Directions")}<button class="act" type="button" data-detail="${x.r.id}">Details</button></div></div><span class="when">${clock(x.arrive)}<small>${x.dwell} min</small></span><button class="x" type="button" data-unplan="${x.r.id}" aria-label="Remove ${esc(x.r.name)}">×</button></div>`).join("")+(hasEnd()?`<div class="gap"><i></i><span>${walkMin(it[it.length-1].r.pt,endPt)} min walk to ${esc(endLabel)}</span></div>`:"")+`<div class="sm" style="font-size:13px;color:var(--muted);margin-top:12px">Wrap up around ${clock(it[it.length-1].arrive+it[it.length-1].dwell)}. Times assume ${it.map(x=>x.dwell).join("/")} min per stop.</div><a class="primary sm" href="${dirUrl(it[0].r)}" target="_blank" rel="noopener" style="text-decoration:none">Directions to stop 1</a>`;
   // next stop ideas near the last stop
   const ideas=$("ideas");
   if(it.length){const last=it[it.length-1].r;const cand=ALL.filter(r=>!plan.includes(r.id)&&r.status!=="closed"&&r.status!=="unverified"&&r.cat!=="Dispensary"&&r.score>=4&&!closedOnDay(r,planDay)).map(r=>({r,m:walkMin(last.pt,r.pt)})).filter(o=>o.m<=Math.min(10,+(prof("maxwalk")||15))&&!(it.some(x=>x.r.type==="Full meal")&&o.r.type==="Full meal")).sort((a,b)=>a.m-b.m||b.r.score-a.r.score).slice(0,3);
@@ -1190,9 +1214,11 @@ function renderOnboard(){let st=OB[obStep];if(st.follow)st=followStep();const bo
   const geo=box.querySelector("#obGeo");if(geo)geo.onclick=()=>{geo.textContent="Locating…";locate(p=>{originWhich="start";setOrigin([p.coords.latitude,p.coords.longitude],"my location");openSheet("onboard");renderOnboard();},()=>{geo.textContent="Use my location";$("obMsg").textContent="Location blocked. Type an address instead.";});};
   const go=box.querySelector("#obGo");if(go)go.onclick=async()=>{originWhich="start";await geocode(box.querySelector("#obAddr").value);openSheet("onboard");renderOnboard();};
   box.querySelector("#obSkip").onclick=()=>obAdvance(false);box.querySelector("#obNext").onclick=()=>obAdvance(true);const bk=box.querySelector("#obBack");if(bk)bk.onclick=()=>{obStep--;renderOnboard();};}
-function obFinish(){profile=obDraft;profile.done=true;store.set("datebars-profile",profile);if(profile.name)store.set("datebars-from",profile.name);closeSheet("onboard");buildOcc();update();}
+let obPartnerKey=null;
+function openPartner(k){obPartnerKey=k;obSingle=true;obStep=OB.findIndex(x=>x.k===k);obDraft=Object.assign({},(profile&&profile.partner)||{});renderOnboard();const h=$("obBody").querySelector("h2");if(h)h.textContent="Your partner: "+h.textContent.toLowerCase();openSheet("onboard");}
+function obFinish(){if(obPartnerKey){profile=profile||{};profile.partner=Object.assign({},profile.partner||{},{[obPartnerKey]:obDraft[obPartnerKey]});obPartnerKey=null;store.set("datebars-profile",profile);closeSheet("onboard");buildOcc();update();return;}profile=obDraft;profile.done=true;store.set("datebars-profile",profile);if(profile.name)store.set("datebars-from",profile.name);closeSheet("onboard");buildOcc();update();}
 function obAdvance(save){let st=OB[obStep];if(st.follow)st=followStep();if(st.text){const n=$("obName");if(n&&save)obDraft.name=n.value.trim();}if(st.date){const d=$("obDate");if(d&&save)obDraft.anniv=d.value;}if(!save&&!obSingle)delete obDraft[st.k];
-  if(obSingle){if(save)obFinish();else closeSheet("onboard");return;}
+  if(obSingle){if(save)obFinish();else{obPartnerKey=null;closeSheet("onboard");}return;}
   if(obGuideOnly&&obStep>=1){obGuideOnly=false;closeSheet("onboard");return;}
   if(obStep<OB.length-1){obStep++;renderOnboard();return;}obFinish();}
 $("pchip").onclick=()=>{personalized=!personalized;store.set("datebars-personalized",personalized);update();};
@@ -1201,7 +1227,14 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-settings]"
 function renderSettings(){const el=$("settings");const P=profile||{};const lbl=(k,v)=>{const st=OB.find(x=>x.k===k);if(!st||!st.opts)return v||"Not set";if(st.one){const o=st.opts.find(x=>x[0]===v);return o?o[1]:"Not set";}return (v||[]).length?(v.map(x=>(st.opts.find(o=>o[0]===x)||[x,x])[1]).join(", ")):"None";};
   const idx=k=>OB.findIndex(x=>x.k===k);
   const row=(k,label,val,step,cls)=>`<div class="setrow ${cls||""}"><div><div class="k">${label}</div><div class="v">${esc(val)}</div></div><button class="edit" type="button" data-editstep="${step}">Edit</button></div>`;
-  el.innerHTML=`<h3>Settings</h3><p class="sub">Everything here stays on this phone.</p>
+  el.classList.toggle("open",settingsOpen);
+  const partnerRows=isCouple()||prof("status")==="new"?`<div class="grp">Your partner</div>
+    <p class="sub">Their preferences count too: the app leans sober-friendly if either of you doesn't drink, shows dispensaries only if both are fine with it, and flags food for both.</p>
+    ${row("pdrink","Partner drinking",lbl("drink",(P.partner||{}).drink),"p:drink")}
+    ${row("pcannabis","Partner cannabis",lbl("cannabis",(P.partner||{}).cannabis),"p:cannabis")}
+    ${row("pdiet","Partner food",lbl("diet",(P.partner||{}).diet),"p:diet")}
+    <div class="setrow"><div><div class="k">Connect their account</div><div class="v">Coming with accounts. For now, add their preferences above.</div></div></div>`:"";
+  el.innerHTML=`<div class="shead" id="shead"><h3>Settings</h3><span class="chev">›</span></div><div class="body"><p class="sub">Everything here stays on this phone.</p>
     <div class="grp">You</div>
     ${row("status","Relationship status",STATUS_L[P.status]||"Not set",idx("status"))}
     ${isCouple()?row("anniv","Anniversary",P.anniv||"Not set",idx("follow")):row("dating","Your dates",{first:"First dates",early:"Second and third dates",mix:"A mix"}[P.dating]||"Not set",idx("follow"))}
@@ -1212,6 +1245,7 @@ function renderSettings(){const el=$("settings");const P=profile||{};const lbl=(
     ${row("diet","Food",lbl("diet",P.diet),idx("diet"))}
     ${row("modes","Getting around",lbl("modes",P.modes),idx("modes"))}
     ${row("maxwalk","Longest walk between stops",P.maxwalk?P.maxwalk+" minutes":"Not set",idx("maxwalk"))}
+    ${partnerRows}
     <div class="grp">Places</div>
     <div class="setrow"><div><div class="k">Usual starting point</div><div class="v">${hasOrigin()?esc(originLabel):"Not set"}</div></div><button class="edit" type="button" data-origin="start">Edit</button></div>
     <div class="setrow"><div><div class="k">Directions open in</div><div class="v">${dirApp==="google"?"Google Maps":"Apple Maps"}</div></div><button class="edit" type="button" id="setDir">Switch</button></div>
@@ -1219,8 +1253,9 @@ function renderSettings(){const el=$("settings");const P=profile||{};const lbl=(
     <div class="setrow"><div><div class="k">How Date Spot works</div><div class="v">The five tabs, and a few tips</div></div><button class="edit" type="button" id="showGuide">Open</button></div>
     <div class="grp">Reset</div>
     <div class="setrow"><div><div class="k">Run setup again</div><div class="v">Walk through every question</div></div><button class="edit" type="button" data-editstep="0" data-all="1">Start</button></div>
-    <div class="setrow danger"><div><div class="k">Clear this phone</div><div class="v">Shortlist, notes, date plan, and answers</div></div><button class="edit" type="button" id="wipe">Clear</button></div>`;
-  el.querySelectorAll("[data-editstep]").forEach(b=>b.onclick=()=>openOnboard(+b.dataset.editstep,!b.dataset.all));
+    <div class="setrow danger"><div><div class="k">Clear this phone</div><div class="v">Shortlist, notes, date plan, and answers</div></div><button class="edit" type="button" id="wipe">Clear</button></div></div>`;
+  el.querySelector("#shead").onclick=()=>{settingsOpen=!settingsOpen;store.set("datebars-settings-open",settingsOpen);el.classList.toggle("open",settingsOpen);};
+  el.querySelectorAll("[data-editstep]").forEach(b=>b.onclick=()=>{const v=b.dataset.editstep;if(v.startsWith("p:"))openPartner(v.slice(2));else openOnboard(+v,!b.dataset.all);});
   el.querySelector("#showGuide").onclick=()=>{obGuideOnly=true;openOnboard(0,false);};
   el.querySelector("#setDir").onclick=()=>{dirApp=dirApp==="google"?"apple":"google";store.set("datebars-dir",dirApp);paintDir();update();};
   el.querySelector("#wipe").onclick=()=>{if(!confirm("Clear the shortlist, notes, date plan, starting point, and your answers on this phone?"))return;["datebars-picks","datebars-notes","datebars-plan","datebars-profile","datebars-origin","datebars-origin-label","datebars-end","datebars-end-label","datebars-slots","datebars-from","datebars-personalized"].forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});location.reload();};}
