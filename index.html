@@ -619,7 +619,7 @@ body.locked .tabs,body.locked .view{visibility:hidden}
 
 <nav class="tabs" aria-label="Sections">
   <div class="sidewm deskonly">Date <em>Spot</em></div>
-  <button type="button" id="tab-short" aria-current="false"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3 1.6-1.8 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z" fill="currentColor"></path></svg><span>Shortlist &amp; Settings <b id="tabShortN"></b></span></button>
+  <button type="button" id="tab-short" aria-current="false"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3 1.6-1.8 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z" fill="currentColor"></path></svg><span>Shortlist &amp; Settings<b id="tabShortN" hidden></b></span></button>
   <button type="button" id="tab-plan" aria-current="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"></rect><circle cx="9" cy="9" r="1.3" fill="currentColor"></circle><circle cx="15" cy="15" r="1.3" fill="currentColor"></circle><circle cx="15" cy="9" r="1.3" fill="currentColor"></circle><circle cx="9" cy="15" r="1.3" fill="currentColor"></circle></svg><span>Plan</span></button>
   <button type="button" id="tab-home" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z" fill="currentColor"></path></svg><span>Home</span></button>
   <button type="button" id="tab-tonight" aria-current="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path><path d="M12 18.2s-3-1.9-3-3.8a1.5 1.5 0 0 1 3-.6 1.5 1.5 0 0 1 3 .6c0 1.9-3 3.8-3 3.8z" fill="currentColor" stroke="none"></path></svg><span>Date</span></button>
@@ -1046,7 +1046,7 @@ function renderShort(){
   const srt=(a,b)=>shSort==="near"?((a.tr.min??0)-(b.tr.min??0)||b.score-a.score):(b.score-a.score||(a.tr.min??0)-(b.tr.min??0));
   const rows=ALL.filter(r=>picks.has(r.id)).sort(srt),brows=ALL.filter(r=>been.has(r.id)).sort(srt);
   $("shortSub").textContent=rows.length+" saved · "+brows.length+" been · notes are private";
-  $("tabShortN").textContent=rows.length?String(rows.length):"";
+  $("tabShortN").textContent="";
   $("favEb").textContent="Favorites · "+rows.length;$("beenEb").textContent="Been there · "+brows.length;
   $("shortlist").innerHTML=rows.length?rows.map(r=>shRow(r,"fav")).join(""):'<div class="empty">Nothing saved yet. Tap the heart on any place and it lands here.</div>';
   $("beenlist").innerHTML=brows.length?brows.map(r=>shRow(r,"been")).join(""):'<div class="empty">Tap "Been here" on a place after you go, and it lands here.</div>';
