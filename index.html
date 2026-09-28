@@ -1167,8 +1167,10 @@ $("mapCap").onclick=()=>{mapCap=!mapCap;$("mapCap").setAttribute("aria-pressed",
 $("mapOpen").onclick=()=>{openNowEl.checked=!openNowEl.checked;$("mapOpen").setAttribute("aria-pressed",openNowEl.checked);update();};
 $("mapOcc").onclick=()=>{showView("home");};
 $("locate").onclick=()=>{locate(p=>{const pt=[p.coords.latitude,p.coords.longitude];if(meMarker)meMarker.setLatLng(pt);else meMarker=L.marker(pt,{icon:L.divIcon({className:"",html:'<span class="pin me"></span>',iconSize:null}),interactive:false,keyboard:false}).addTo(map);map.setView(pt,15);setOrigin(pt,"my location");},()=>{$("maplist").insertAdjacentHTML("afterbegin",'<div class="hint" style="padding:6px 22px">Location blocked. Allow it in Settings.</div>');});};
+let lastFitKey=null;
 function renderMap(){
   if(!map)return;pinLayer.clearLayers();planLayer.clearLayers();
+  {const key=hood+"|"+homeMode;if(key!==lastFitKey){lastFitKey=key;if(hood!=="All"){const pts=ALL.filter(r=>r.hood===hood).map(r=>r.pt);if(pts.length)map.fitBounds(L.latLngBounds(pts),{padding:[40,40],maxZoom:16});}}}
   let rows=(isDesktop()&&view==="home")?shown.slice():sortRows(occRows(baseRows(),occasion),"dist");if(mapCap&&hasOrigin()&&!(isDesktop()&&view==="home"))rows=rows.filter(r=>r.tr.min<=20);mapRows=rows;if(isDesktop()&&(!hlId||!rows.some(r=>r.id===hlId))&&rows.length)hlId=rows[0].id;$("mapListTitle").textContent=hasOrigin()?"Closest to you":"Highest rated";$("mapCap").hidden=!hasOrigin();
   const z=map.getZoom();
   if(z<(isDesktop()?14:13.75)){ // clusters by neighborhood
